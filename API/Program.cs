@@ -1,12 +1,18 @@
 using Dapper;
+using Domain.Entities;
+using Domain.Interfaces;
 using Persistence;
+using Persistence.Repositories;
 using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Retrieve the initial connection string pointing to the master database
 var masterConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -36,15 +42,23 @@ builder.Services.AddScoped<IDbConnection>(sp => sp.GetRequiredService<DatabaseCo
 // Register the DatabaseSetup class for initialization
 builder.Services.AddScoped<DatabaseSetup>();
 
+// Register repositories and unit of work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IRepository<Employee>>(sp =>
+{
+    var unitOfWork = sp.GetRequiredService<IUnitOfWork>();
+    return unitOfWork.EmployeeRepository;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
