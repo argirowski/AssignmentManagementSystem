@@ -1,0 +1,33 @@
+# Backend
+API/bin/
+API/obj/
+Application/bin/
+Application/obj/
+Domain/bin/
+Domain/obj/
+Persistence/bin/
+Persistence/obj/
+Infrastructure/bin/
+Infrastructure/obj/
+
+# Unit Tests
+BookManagementUnitTests/bin/
+BookManagementUnitTests/obj/
+
+# Frontend
+book-management-ui/node_modules/
+book-management-ui/build/
+book-management-ui/.env
+
+# BookManagement Folder
+.vs/
+bin/
+obj/
+WorkFlowExplained.txt
+
+# General
+*.user
+*.suo
+*.cache
+*.log
+.DS_Store

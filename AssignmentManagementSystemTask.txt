@@ -1,0 +1,100 @@
+🎯 Build a Assignment Management System with Employees and Tags.
+
+📌 Objective:
+➡️ Develop a Assignment Management System using the following technologies:
+🔹 Backend: .NET Core with Dapper for database interaction.
+🔹 Frontend: React with TypeScript and Redux for state management.
+🔹 Patterns: Implement the Repository Pattern with the Unit of Work Pattern.
+🔹 Relationships: Include a one-to-many relationship between employees and assignments (One employee can have many assignments. Each assignment, however, belongs to exactly one employee), and a many-to-many relationship between assignments and tags (A single assignment can have many tags. Similarly, a single tag can belong to multiple assignments).
+
+This system should demonstrate the ability to manage relationships in a database and reflect them in both backend logic and frontend state management
+
+📌 Functional Requirements:
+➡️ Employee Features:
+🔹 An employees should only see, add, update, or delete assignments associated with them.
+🔹 Each assignment should belong to exactly one employee.
+🔹 Each employee should have:
+✔ Employee ID: Unique identifier.
+✔ Name: The employee's full name. This could be used for display purposes.
+✔ Email: The employee's email address. It must be unique to avoid duplicate employee entries.
+
+➡️ Assignment Features:
+🔹 Each assignment should have:
+✔ Task ID: Unique identifier.
+✔ Title: Short title for the assignment (max 255 characters).
+✔ Description: Optional detailed information about the assignment.
+✔ IsCompleted: Boolean flag to indicate whether the assignment is completed.
+✔ CreatedAt: Timestamp of creation.
+✔ Tags: Option to associate multiple tags with a assignment.
+
+➡️ Tag Features:
+✔ Employees can create and assign tags to assignments.
+✔ A tag can belong to multiple assignments, and a assignment can have multiple tags (Many-to-Many relationship).
+🔹 Each tag should have:
+✔ Tag ID: Unique identifier.
+✔ Name: Name of the tag.
+
+➡️ Assignment State Management:
+✔ Use Redux to manage state, with actions and reducers for assignments, employees, and tags.
+✔ Dispatch actions such as ADD_ASSIGNMENT, UPDATE_ASSIGNMENT, DELETE_ASSIGNMENT, ADD_ASSIGNMENT, ASSIGN_ASSIGNMENT.
+
+➡️ Routing with React Router:
+✔ Use React Router for navigation between pages.
+
+➡️ API Communication with Axios:
+✔ Use Axios to handle all HTTP requests to the backend.
+
+➡️ API Endpoints:
+✔ Employee Management:
+🔹 POST/employees - Add a new employee.
+🔹 GET/employees/{id}/assignments - Fetch assignments for a specific employee.
+
+✔ Task Management:
+🔹 GET/assignments - Fetch all assignments.
+🔹 GET/assignments{id} - Fetch a specific assignment.
+🔹 POST/assignments - Add a new assignment.
+🔹 PUT/assignments/{id} - Update a assignment.
+🔹 DELETE/assignments/{id} - Delete a assignment.
+
+✔ Tag Management:
+🔹 POST/tags - Create a new tag.
+🔹 GET/tags - Fetch all tags.
+🔹 POST/assignments/{assignmentId}/tags - Assign a tag to a assignment.
+🔹 GET/assignments/{assignmentId}/tags - Fetch all tags for a assignment.
+
+📌 Technical Requirements:
+✅ Backend:
+🔹 Implement repositories for Employees, Assignments, and Tags.
+🔹 Use the Unit of Work pattern to manage transactions between assignments and tags.
+
+✅ Frontend:
+🔹 Use TypeScript for strict type checking.
+🔹 Build Redux actions, reducers, and selectors for employees, assignments, and tags.
+
+✅ State and Data Flow:
+🔹 Use Redux to manage state for assignments, employees, and tags.
+🔹 Implement useSelector()  hooks to fetch filtered data (e.g., assignments by employee or assignments by tag).
+🔹 Use Redux Thunk or middleware to handle async API calls.
+
+✅ Validation:
+🔹 Validate user input the frontend with react hook form with Zod.
+🔹 Validate user input the backend with fluent validation.
+
+📌 Optional Stretch Goals:
+If time allows, implement the following optional features:
+
+✅ Pagination and Sorting::
+🔹 Paginate assignment lists.
+🔹 Add sorting (e.g.,by CreatedAt or Title).
+
+✅ Filtering:
+🔹 Filter assignments by tags or completion status.
+
+✅ Test Coverage:
+✔ Backend Unit and Integration Tests:
+🔹 Write unit tests for backend components, such as services and repositories, using a testing framework like xUnit or NUnit.
+🔹 Write integration tests to ensure correct interaction between components and the database (e.g., validating repository methods with a test database).
+
+✔ Frontend Jest Tests:
+🔹 Write unit tests for Redux reducers, actions, and selectors.
+🔹 Write Jest component tests using React Testing Library to validate UI behavior and form input validations.
