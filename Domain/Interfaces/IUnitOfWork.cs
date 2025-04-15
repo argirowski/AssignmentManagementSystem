@@ -4,7 +4,7 @@ namespace Domain.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<Employee> EmployeeRepository { get; }
+        IEmployeeRepository EmployeeRepository { get; }
         Task CommitAsync();
     }
 }

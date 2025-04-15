@@ -1,92 +1,63 @@
-﻿using Domain.Entities;
-using Domain.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace Presentation.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class EmployeesController : ControllerBase
+    [Route("api/[controller]")]
+    public class EmployeeController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeesController(IUnitOfWork unitOfWork)
+        public EmployeeController(IEmployeeService employeeService)
         {
-            _unitOfWork = unitOfWork;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] Employee employee)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            employee.Id = Guid.NewGuid();
-            await _unitOfWork.EmployeeRepository.AddAsync(employee);
-            await _unitOfWork.CommitAsync();
-
-            return CreatedAtAction(nameof(AddEmployee), new { id = employee.Id }, employee);
+            _employeeService = employeeService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployees()
+        public async Task<IActionResult> GetAll()
         {
-            var employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+            var employees = await _employeeService.GetAllEmployeesAsync();
             return Ok(employees);
         }
 
-        [HttpGet("id")]
-        public async Task<IActionResult> GetEmployeeById(Guid id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
-
+            var employee = await _employeeService.GetEmployeeByIdAsync(id);
             if (employee == null)
             {
-                return NotFound($"Employee with ID {id} was not found.");
+                return NotFound();
             }
-
             return Ok(employee);
         }
 
-        [HttpPut("id")]
-        public async Task<IActionResult> UpdateEmployee(Guid id, [FromBody] Employee employee)
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateEmployeeDTO createEmployeeDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var existingEmployee = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
-            if (existingEmployee == null)
-            {
-                return NotFound($"Employee with ID {id} was not found.");
-            }
-
-            // Update fields
-            existingEmployee.Name = employee.Name;
-            existingEmployee.Email = employee.Email;
-
-            await _unitOfWork.EmployeeRepository.UpdateAsync(existingEmployee);
-            await _unitOfWork.CommitAsync();
-
-            return Ok(existingEmployee);
+            var employeeDTO = await _employeeService.AddEmployeeAsync(createEmployeeDTO);
+            return CreatedAtAction(nameof(GetById), new { id = employeeDTO.Id }, employeeDTO);
         }
 
-        [HttpDelete("id")]
-        public async Task<IActionResult> DeleteEmployee(Guid id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, EmployeeDTO employeeDTO)
         {
-            var existingEmployee = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
-            if (existingEmployee == null)
+            if (id != employeeDTO.Id)
             {
-                return NotFound($"Employee with ID {id} was not found.");
+                return BadRequest();
             }
 
-            await _unitOfWork.EmployeeRepository.DeleteAsync(id);
-            await _unitOfWork.CommitAsync();
+            await _employeeService.UpdateEmployeeAsync(employeeDTO);
+            return NoContent();
+        }
 
-            return NoContent(); // 204 No Content response
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _employeeService.DeleteEmployeeAsync(id);
+            return NoContent();
         }
     }
 }

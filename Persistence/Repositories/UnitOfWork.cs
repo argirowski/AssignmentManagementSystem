@@ -9,7 +9,8 @@ namespace Persistence.Repositories
         private readonly IDbConnection _dbConnection;
         private IDbTransaction _dbTransaction;
 
-        private IRepository<Employee>? _employeeRepository;
+        private IEmployeeRepository? _employeeRepository;
+        private bool _disposed;
 
         public UnitOfWork(IDbConnection dbConnection)
         {
@@ -18,7 +19,7 @@ namespace Persistence.Repositories
             _dbTransaction = _dbConnection.BeginTransaction();
         }
 
-        public IRepository<Employee> EmployeeRepository
+        public IEmployeeRepository EmployeeRepository
         {
             get
             {
@@ -39,14 +40,18 @@ namespace Persistence.Repositories
             }
             finally
             {
-                _dbConnection.Close();
+                Dispose();
             }
         }
 
         public void Dispose()
         {
-            _dbTransaction.Dispose();
-            _dbConnection.Dispose();
+            if (!_disposed)
+            {
+                _dbTransaction.Dispose();
+                _dbConnection.Dispose();
+                _disposed = true;
+            }
         }
     }
 }

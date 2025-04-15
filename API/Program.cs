@@ -1,3 +1,6 @@
+using Application.Interfaces;
+using Application.Mapping;
+using Application.Services;
 using Dapper;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -44,11 +47,17 @@ builder.Services.AddScoped<DatabaseSetup>();
 
 // Register repositories and unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IRepository<Employee>>(sp =>
+builder.Services.AddScoped<IEmployeeRepository>(sp =>
 {
     var unitOfWork = sp.GetRequiredService<IUnitOfWork>();
     return unitOfWork.EmployeeRepository;
 });
+
+// Configure AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Register application services
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 var app = builder.Build();
 
