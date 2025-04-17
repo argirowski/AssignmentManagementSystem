@@ -46,11 +46,22 @@ namespace Presentation.Controllers
         {
             if (id != employeeDTO.Id)
             {
-                return BadRequest();
+                return BadRequest(new { message = "The ID in the URL does not match the ID in the request body." });
             }
 
-            await _employeeService.UpdateEmployeeAsync(employeeDTO);
-            return NoContent();
+            try
+            {
+                await _employeeService.UpdateEmployeeAsync(employeeDTO);
+                return NoContent(); // Return 204 No Content if successful
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Employee not found." }); // Return 404 if the employee does not exist
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the employee.", details = ex.Message }); // Return 500 for unexpected errors
+            }
         }
 
         [HttpDelete("{id}")]

@@ -79,8 +79,13 @@ namespace Application.Services
 
         public async Task UpdateEmployeeAsync(EmployeeDTO employeeDto)
         {
+            // Map the DTO to the Employee entity
             var employee = _mapper.Map<Employee>(employeeDto);
+
+            // Call the repository to update the employee and related data
             await _unitOfWork.EmployeeRepository.UpdateAsync(employee);
+
+            // Commit the transaction
             await _unitOfWork.CommitAsync();
         }
 
