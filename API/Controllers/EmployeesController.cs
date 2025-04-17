@@ -56,8 +56,19 @@ namespace Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _employeeService.DeleteEmployeeAsync(id);
-            return NoContent();
+            try
+            {
+                await _employeeService.DeleteEmployeeAsync(id);
+                return NoContent(); // Return 204 No Content if successful
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Employee not found." }); // Return 404 if the employee does not exist
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the employee.", details = ex.Message }); // Return 500 for unexpected errors
+            }
         }
     }
 }

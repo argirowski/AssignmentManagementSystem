@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Application.DTOs;
 using Application.Interfaces;
+using Application.Exceptions;
 
 namespace Application.Services
 {
@@ -39,6 +40,12 @@ namespace Application.Services
             {
                 foreach (var createAssignmentDto in createEmployeeDto.Assignments)
                 {
+                    // Check if the assignment already exists
+                    if (await _unitOfWork.EmployeeRepository.AssignmentExistsAsync(createAssignmentDto.Title))
+                    {
+                        throw new DuplicateAssignmentException(createAssignmentDto.Title);
+                    }
+
                     var assignment = _mapper.Map<Assignment>(createAssignmentDto);
                     assignment.Id = Guid.NewGuid(); // Generate new Id
                     assignment.CreatedAt = DateTime.UtcNow; // Set CreatedAt to current date and time
@@ -49,7 +56,14 @@ namespace Application.Services
                     {
                         foreach (var tagDto in createAssignmentDto.Tags)
                         {
+                            // Check if the tag already exists
+                            if (await _unitOfWork.EmployeeRepository.TagExistsAsync(tagDto.Name))
+                            {
+                                throw new DuplicateTagException(tagDto.Name);
+                            }
+
                             var tag = _mapper.Map<Tag>(tagDto);
+                            tag.Id = Guid.NewGuid(); // Generate new Id for tag
                             await _unitOfWork.EmployeeRepository.AddTagAsync(tag);
                             await _unitOfWork.EmployeeRepository.AddAssignmentTagAsync(assignment.Id, tag.Id);
                         }
@@ -72,7 +86,10 @@ namespace Application.Services
 
         public async Task DeleteEmployeeAsync(Guid id)
         {
+            // Call the repository to delete the employee and related data
             await _unitOfWork.EmployeeRepository.DeleteAsync(id);
+
+            // Commit the transaction
             await _unitOfWork.CommitAsync();
         }
     }

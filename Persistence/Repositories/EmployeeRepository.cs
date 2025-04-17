@@ -40,6 +40,18 @@ namespace Persistence.Repositories
             await _dbConnection.ExecuteAsync(sql, new { AssignmentId = assignmentId, TagId = tagId }, _dbTransaction);
         }
 
+        public async Task<bool> AssignmentExistsAsync(string title)
+        {
+            const string sql = "SELECT COUNT(1) FROM Assignment WHERE Title = @Title AND EmployeeId = @EmployeeId";
+            return await _dbConnection.ExecuteScalarAsync<bool>(sql, new { Title = title }, _dbTransaction);
+        }
+
+        public async Task<bool> TagExistsAsync(string name)
+        {
+            const string sql = "SELECT COUNT(1) FROM Tag WHERE Name = @Name";
+            return await _dbConnection.ExecuteScalarAsync<bool>(sql, new { Name = name }, _dbTransaction);
+        }
+
         public async Task<IEnumerable<Employee>> GetAllAsync()
         {
             const string sql = @"
@@ -142,8 +154,21 @@ namespace Persistence.Repositories
 
         public async Task DeleteAsync(Guid id)
         {
-            const string sql = "DELETE FROM Employees WHERE Id = @Id";
-            await _dbConnection.ExecuteAsync(sql, new { Id = id }, _dbTransaction);
+            // Delete related assignment-tag relationships
+            const string deleteAssignmentTagsSql = @"
+                DELETE at
+                FROM AssignmentTag at
+                INNER JOIN Assignment a ON at.AssignmentId = a.Id
+                WHERE a.EmployeeId = @EmployeeId";
+            await _dbConnection.ExecuteAsync(deleteAssignmentTagsSql, new { EmployeeId = id }, _dbTransaction);
+
+            // Delete related assignments
+            const string deleteAssignmentsSql = "DELETE FROM Assignment WHERE EmployeeId = @EmployeeId";
+            await _dbConnection.ExecuteAsync(deleteAssignmentsSql, new { EmployeeId = id }, _dbTransaction);
+
+            // Delete the employee
+            const string deleteEmployeeSql = "DELETE FROM Employee WHERE Id = @Id";
+            await _dbConnection.ExecuteAsync(deleteEmployeeSql, new { Id = id }, _dbTransaction);
         }
     }
 }
