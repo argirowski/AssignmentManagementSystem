@@ -1,4 +1,4 @@
-🎯 Build a Assignment Management System with Employees and Tags.
+🎯 Build a Assignment Management System
 
 📌 Objective:
 ➡️ Develop a Assignment Management System using the following technologies:

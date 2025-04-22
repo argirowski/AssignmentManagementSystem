@@ -3,8 +3,7 @@
     public class EmployeeDTO
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public List<AssignmentDTO>? Assignments { get; set; } = new List<AssignmentDTO>();
+        public required string FullName { get; set; }
+        public required string Email { get; set; }
     }
 }

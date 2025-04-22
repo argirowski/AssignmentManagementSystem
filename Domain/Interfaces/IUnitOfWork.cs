@@ -1,10 +1,11 @@
-﻿using Domain.Entities;
+using Domain.Interfaces.Repositories;
 
-namespace Domain.Interfaces
+namespace Domain.Interfaces;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork : IDisposable
-    {
-        IEmployeeRepository EmployeeRepository { get; }
-        Task CommitAsync();
-    }
+    ICategoryRepository Categories { get; }
+    IStatusRepository Statuses { get; }
+    IEmployeeRepository Employees { get; }
+    Task<int> CompleteAsync();
 }
