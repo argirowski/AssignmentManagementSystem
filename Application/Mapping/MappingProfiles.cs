@@ -15,6 +15,7 @@ namespace Application.Mapping
             CreateMap<CreateStatusDTO, Status>();
 
             CreateMap<Employee, EmployeeDTO>().ReverseMap();
+            CreateMap<CreateEmployeeDTO, Employee>();
         }
     }
 }

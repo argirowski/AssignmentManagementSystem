@@ -2,63 +2,63 @@ using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-    [Route("api/[controller]")]
-    public class EmployeeController : ControllerBase
+[Route("api/[controller]")]
+public class EmployeeController : ControllerBase
+{
+    private readonly IEmployeeService _employeeService;
+
+    public EmployeeController(IEmployeeService employeeService)
     {
-        private readonly IEmployeeService _employeeService;
+        _employeeService = employeeService;
+    }
 
-        public EmployeeController(IEmployeeService employeeService)
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var employees = await _employeeService.GetAllEmployeesAsync();
+        return Ok(employees);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var employee = await _employeeService.GetEmployeeByIdAsync(id);
+        if (employee == null) return NotFound();
+        return Ok(employee);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateEmployeeDTO createEmployeeDTO)
+    {
+        var createdEmployee = await _employeeService.CreateEmployeeAsync(createEmployeeDTO);
+        return CreatedAtAction(nameof(GetById), new { id = createdEmployee.Id }, createdEmployee);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, EmployeeDTO employeeDTO)
+    {
+        try
         {
-            _employeeService = employeeService;
+            var updatedEmployee = await _employeeService.UpdateEmployeeAsync(id, employeeDTO);
+            return Ok(updatedEmployee);
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        catch (KeyNotFoundException)
         {
-            var employees = await _employeeService.GetAllAsync();
-            return Ok(employees);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
-        {
-            var employee = await _employeeService.GetByIdAsync(id);
-            if (employee == null) return NotFound();
-            return Ok(employee);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(EmployeeDTO employeeDto)
-        {
-            var createdEmployee = await _employeeService.CreateAsync(employeeDto);
-            return CreatedAtAction(nameof(GetById), new { id = createdEmployee.Id }, createdEmployee);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, EmployeeDTO employeeDto)
-        {
-            try
-            {
-                var updatedEmployee = await _employeeService.UpdateAsync(id, employeeDto);
-                return Ok(updatedEmployee);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            try
-            {
-                await _employeeService.DeleteAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            return NotFound();
         }
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await _employeeService.DeleteEmployeeAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+}
