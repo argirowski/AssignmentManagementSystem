@@ -11,6 +11,7 @@ namespace Persistence.UnitOfWork
         private ICategoryRepository? _categoryRepository;
         private IStatusRepository? _statusRepository;
         private IEmployeeRepository? _employeeRepository;
+        private IAssignmentRepository? _assignmentRepository;
 
         public UnitOfWork(IDbConnection dbConnection)
         {
@@ -20,6 +21,7 @@ namespace Persistence.UnitOfWork
         public ICategoryRepository Categories => _categoryRepository ??= new CategoryRepository(_dbConnection);
         public IStatusRepository Statuses => _statusRepository ??= new StatusRepository(_dbConnection);
         public IEmployeeRepository Employees => _employeeRepository ??= new EmployeeRepository(_dbConnection);
+        public IAssignmentRepository Assignments => _assignmentRepository ??= new AssignmentRepository(_dbConnection);
 
         public async Task<int> CompleteAsync()
         {

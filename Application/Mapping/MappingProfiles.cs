@@ -16,6 +16,8 @@ namespace Application.Mapping
 
             CreateMap<Employee, EmployeeDTO>().ReverseMap();
             CreateMap<CreateEmployeeDTO, Employee>();
+
+            CreateMap<Assignment, AssignmentDTO>().ReverseMap();
         }
     }
 }
