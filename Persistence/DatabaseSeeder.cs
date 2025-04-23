@@ -113,6 +113,8 @@ public class DatabaseSeeder
                     Id UNIQUEIDENTIFIER PRIMARY KEY,
                     Title NVARCHAR(255) NOT NULL,
                     Description NVARCHAR(MAX) NOT NULL,
+                    IsCompleted BIT NOT NULL,
+                    CreatedAt DATETIME NOT NULL,
                     EmployeeId UNIQUEIDENTIFIER NOT NULL,
                     StatusId UNIQUEIDENTIFIER NOT NULL,
                     FOREIGN KEY (EmployeeId) REFERENCES Employees(Id),
@@ -142,11 +144,11 @@ public class DatabaseSeeder
         {
             var assignments = new[]
             {
-                new { Id = Guid.Parse("e89ff54f-5ff6-4c68-88cd-af53336c55a0"), Title = "Task 1", Description = "Description for Task 1", EmployeeId = Guid.Parse("9b232288-2afb-4771-a993-8547e4968e99"), StatusId = Guid.Parse("138d3fce-a5f4-4c98-8dc4-a7384e9b0daf") },
-                new { Id = Guid.Parse("6e7ade97-d09b-4ea3-8380-95f3740e62e3"), Title = "Task 2", Description = "Description for Task 2", EmployeeId = Guid.Parse("93da5b27-6238-4015-8601-6ff334c11060"), StatusId = Guid.Parse("bd8c136e-63cc-481c-a99a-781cb907b3b7") }
+                new { Id = Guid.Parse("e89ff54f-5ff6-4c68-88cd-af53336c55a0"), Title = "Task 1", Description = "Description for Task 1", IsCompleted = false, CreatedAt = DateTime.UtcNow.AddDays(-10), EmployeeId = Guid.Parse("9b232288-2afb-4771-a993-8547e4968e99"), StatusId = Guid.Parse("138d3fce-a5f4-4c98-8dc4-a7384e9b0daf") },
+                new { Id = Guid.Parse("6e7ade97-d09b-4ea3-8380-95f3740e62e3"), Title = "Task 2", Description = "Description for Task 2", IsCompleted = true, CreatedAt = DateTime.UtcNow.AddDays(-5), EmployeeId = Guid.Parse("93da5b27-6238-4015-8601-6ff334c11060"), StatusId = Guid.Parse("bd8c136e-63cc-481c-a99a-781cb907b3b7") }
             };
 
-            const string insertAssignmentsQuery = "INSERT INTO Assignments (Id, Title, Description, EmployeeId, StatusId) VALUES (@Id, @Title, @Description, @EmployeeId, @StatusId)";
+            const string insertAssignmentsQuery = "INSERT INTO Assignments (Id, Title, Description, IsCompleted, CreatedAt, EmployeeId, StatusId) VALUES (@Id, @Title, @Description, @IsCompleted, @CreatedAt, @EmployeeId, @StatusId)";
             await _dbConnection.ExecuteAsync(insertAssignmentsQuery, assignments);
 
             var assignmentCategories = new[]

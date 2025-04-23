@@ -1,10 +1,11 @@
-namespace Domain.Entities;
-
-public class Category
+namespace Domain.Entities
 {
-    public Guid Id { get; set; }
+    public class Category
+    {
+        public Guid Id { get; set; }
 
-    public required string Name { get; set; }
+        public required string Name { get; set; }
 
-    public ICollection<AssignmentCategory> AssignmentCategories { get; set; } = new List<AssignmentCategory>();
+        public ICollection<AssignmentCategory> AssignmentCategories { get; set; } = new List<AssignmentCategory>();
+    }
 }
