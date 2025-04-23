@@ -18,6 +18,11 @@ namespace Application.Mapping
             CreateMap<CreateEmployeeDTO, Employee>();
 
             CreateMap<Assignment, AssignmentDTO>().ReverseMap();
+
+            CreateMap<Assignment, AssignmentDTO>()
+                .ForMember(dest => dest.Employee, opt => opt.MapFrom(src => src.Employee))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.AssignmentCategories.Select(ac => ac.Category)));
         }
     }
 }
