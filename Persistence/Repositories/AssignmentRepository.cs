@@ -62,8 +62,48 @@ public class AssignmentRepository : IAssignmentRepository
 
     public async Task<Assignment> GetByIdAsync(Guid id)
     {
-        const string query = "SELECT * FROM Assignments WHERE Id = @Id";
-        return await _dbConnection.QuerySingleOrDefaultAsync<Assignment>(query, new { Id = id });
+        const string query = @"SELECT a.Id, a.Title, a.Description, a.IsCompleted, a.CreatedAt, a.EmployeeId, a.StatusId, 
+                          e.Id, e.FullName, e.Email, 
+                          s.Id, s.Description, 
+                          c.Id, c.Name
+                          FROM Assignments a
+                          JOIN Employees e ON a.EmployeeId = e.Id
+                          JOIN Statuses s ON a.StatusId = s.Id
+                          LEFT JOIN AssignmentCategories ac ON a.Id = ac.AssignmentId
+                          LEFT JOIN Categories c ON ac.CategoryId = c.Id
+                          WHERE a.Id = @Id";
+
+        var assignmentDictionary = new Dictionary<Guid, Assignment>();
+
+        var result = await _dbConnection.QueryAsync<Assignment, Employee, Status, Category, Assignment>(
+            query,
+            (assignment, employee, status, category) =>
+            {
+                if (!assignmentDictionary.TryGetValue(assignment.Id, out var assignmentEntry))
+                {
+                    assignmentEntry = assignment;
+                    assignmentEntry.Employee = employee;
+                    assignmentEntry.Status = status;
+                    assignmentEntry.AssignmentCategories = new List<AssignmentCategory>();
+                    assignmentDictionary.Add(assignment.Id, assignmentEntry);
+                }
+
+                if (category != null)
+                {
+                    assignmentEntry.AssignmentCategories.Add(new AssignmentCategory
+                    {
+                        AssignmentId = assignment.Id,
+                        CategoryId = category.Id,
+                        Category = category
+                    });
+                }
+
+                return assignmentEntry;
+            },
+            new { Id = id },
+            splitOn: "Id,Id,Id");
+
+        return assignmentDictionary.Values.FirstOrDefault();
     }
 
     public async Task AddAsync(Assignment assignment)
