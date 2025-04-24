@@ -1,7 +1,6 @@
 using Dapper;
 using Domain.Entities;
 using System.Data;
-using System.Threading.Tasks;
 
 namespace Persistence.Repositories
 {

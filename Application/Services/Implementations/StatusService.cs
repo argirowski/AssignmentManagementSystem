@@ -26,6 +26,7 @@ namespace Application.Services.Implementations
         public async Task<StatusDTO?> GetStatusByIdAsync(Guid id)
         {
             var status = await _unitOfWork.Statuses.GetByIdAsync(id);
+
             if (status == null)
             {
                 throw new KeyNotFoundException("No such Status exists.");
@@ -36,8 +37,8 @@ namespace Application.Services.Implementations
 
         public async Task CreateStatusAsync(CreateStatusDTO createStatusDTO)
         {
-            // Check if a status with the same description already exists
             var existingStatus = await _unitOfWork.Statuses.GetByDescriptionAsync(createStatusDTO.Description);
+
             if (existingStatus != null)
             {
                 throw new InvalidOperationException($"A status with the description '{createStatusDTO.Description}' already exists.");
@@ -53,11 +54,14 @@ namespace Application.Services.Implementations
         public async Task UpdateStatusAsync(Guid id, StatusDTO statusDTO)
         {
             var status = await _unitOfWork.Statuses.GetByIdAsync(id);
-            if (status == null)
-                throw new KeyNotFoundException("Status not found");
 
-            // Check if a status with the same description already exists (excluding the current status)
+            if (status == null)
+            {
+                throw new KeyNotFoundException("Status not found");
+            }
+
             var existingStatus = await _unitOfWork.Statuses.GetByDescriptionAsync(statusDTO.Description);
+
             if (existingStatus != null && existingStatus.Id != id)
             {
                 throw new InvalidOperationException($"A status with the description '{statusDTO.Description}' already exists.");
@@ -72,11 +76,16 @@ namespace Application.Services.Implementations
         public async Task DeleteStatusAsync(Guid id)
         {
             if (await _unitOfWork.Statuses.IsStatusLinkedToAssignmentsAsync(id))
+            {
                 throw new InvalidOperationException("You cannot delete this status because it is linked to assignments.");
+            }
 
             var status = await _unitOfWork.Statuses.GetByIdAsync(id);
+
             if (status == null)
+            {
                 throw new KeyNotFoundException("The Status you are trying to delete does not exist.");
+            }
 
             await _unitOfWork.Statuses.DeleteAsync(id);
             await _unitOfWork.CompleteAsync();

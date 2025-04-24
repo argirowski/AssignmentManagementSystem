@@ -23,17 +23,19 @@ public class EmployeeService : IEmployeeService
     public async Task<EmployeeDTO> GetEmployeeByIdAsync(Guid id)
     {
         var employee = await _unitOfWork.Employees.GetByIdAsync(id);
+
         if (employee == null)
         {
             throw new KeyNotFoundException("No such Employee exists.");
         }
+
         return _mapper.Map<EmployeeDTO>(employee);
     }
 
     public async Task<EmployeeDTO> CreateEmployeeAsync(CreateEmployeeDTO createEmployeeDTO)
     {
-        // Check if an employee with the same full name already exists
         var existingEmployee = await _unitOfWork.Employees.GetByFullNameAsync(createEmployeeDTO.FullName);
+
         if (existingEmployee != null)
         {
             throw new InvalidOperationException($"An employee with the name '{createEmployeeDTO.FullName}' already exists.");
@@ -49,12 +51,14 @@ public class EmployeeService : IEmployeeService
     public async Task<EmployeeDTO> UpdateEmployeeAsync(Guid id, EmployeeDTO employeeDto)
     {
         var employee = await _unitOfWork.Employees.GetByIdAsync(id);
+
         if (employee == null)
         {
             throw new KeyNotFoundException("The Employee you are trying to update does not exist.");
         }
-        // Check if an employee with the same full name already exists (excluding the current employee)
+
         var existingEmployee = await _unitOfWork.Employees.GetByFullNameAsync(employeeDto.FullName);
+
         if (existingEmployee != null && existingEmployee.Id != id)
         {
             throw new InvalidOperationException($"An employee with the name '{employeeDto.FullName}' already exists.");
@@ -72,8 +76,11 @@ public class EmployeeService : IEmployeeService
             throw new InvalidOperationException("Cannot delete employee as they are linked to assignments.");
 
         var employee = await _unitOfWork.Employees.GetByIdAsync(id);
+
         if (employee == null)
+        {
             throw new KeyNotFoundException("The Employee you are trying to delete does not exist.");
+        }
 
         _unitOfWork.Employees.Remove(employee);
         await _unitOfWork.CompleteAsync();
