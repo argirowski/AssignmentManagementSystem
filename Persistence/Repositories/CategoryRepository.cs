@@ -43,4 +43,11 @@ public class CategoryRepository : ICategoryRepository
         const string query = "DELETE FROM Categories WHERE Id = @Id";
         await _dbConnection.ExecuteAsync(query, new { Id = id });
     }
+
+    public async Task<bool> IsCategoryLinkedToAssignmentsAsync(Guid categoryId)
+    {
+        const string query = "SELECT COUNT(1) FROM AssignmentCategories WHERE CategoryId = @CategoryId";
+        var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { CategoryId = categoryId });
+        return count > 0;
+    }
 }

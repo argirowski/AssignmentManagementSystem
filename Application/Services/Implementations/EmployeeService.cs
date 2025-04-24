@@ -48,8 +48,12 @@ public class EmployeeService : IEmployeeService
 
     public async Task DeleteEmployeeAsync(Guid id)
     {
+        if (await _unitOfWork.Employees.IsEmployeeLinkedToAssignmentsAsync(id))
+            throw new InvalidOperationException("Cannot delete employee as they are linked to assignments.");
+
         var employee = await _unitOfWork.Employees.GetByIdAsync(id);
-        if (employee == null) throw new KeyNotFoundException("Employee not found");
+        if (employee == null)
+            throw new KeyNotFoundException("Employee not found");
 
         _unitOfWork.Employees.Remove(employee);
         await _unitOfWork.CompleteAsync();

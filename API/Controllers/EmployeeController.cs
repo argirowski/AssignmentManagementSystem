@@ -56,6 +56,10 @@ public class EmployeeController : ControllerBase
             await _employeeService.DeleteEmployeeAsync(id);
             return NoContent();
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { Message = ex.Message });
+        }
         catch (KeyNotFoundException)
         {
             return NotFound();

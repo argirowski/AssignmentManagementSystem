@@ -61,6 +61,10 @@ namespace API.Controllers
                 await _categoryService.DeleteCategoryAsync(id);
                 return NoContent();
             }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
             catch (KeyNotFoundException)
             {
                 return NotFound();

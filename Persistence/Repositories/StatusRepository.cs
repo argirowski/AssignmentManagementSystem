@@ -9,7 +9,7 @@ public class StatusRepository : IStatusRepository
 {
     private readonly IDbConnection _dbConnection;
 
-    public StatusRepository (IDbConnection dbConnection)
+    public StatusRepository(IDbConnection dbConnection)
     {
         _dbConnection = dbConnection;
     }
@@ -42,5 +42,12 @@ public class StatusRepository : IStatusRepository
     {
         const string query = "DELETE FROM Statuses WHERE Id = @Id";
         await _dbConnection.ExecuteAsync(query, new { Id = id });
+    }
+
+    public async Task<bool> IsStatusLinkedToAssignmentsAsync(Guid statusId)
+    {
+        const string query = "SELECT COUNT(1) FROM Assignments WHERE StatusId = @StatusId";
+        var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { StatusId = statusId });
+        return count > 0;
     }
 }

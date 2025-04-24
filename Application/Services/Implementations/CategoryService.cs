@@ -52,6 +52,9 @@ namespace Application.Services.Implementations
 
         public async Task DeleteCategoryAsync(Guid id)
         {
+            if (await _unitOfWork.Categories.IsCategoryLinkedToAssignmentsAsync(id))
+                throw new InvalidOperationException("Cannot delete category as it is linked to assignments.");
+
             var category = await _unitOfWork.Categories.GetByIdAsync(id);
             if (category == null)
                 throw new KeyNotFoundException("Category not found");

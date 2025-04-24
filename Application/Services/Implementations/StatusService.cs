@@ -52,6 +52,9 @@ namespace Application.Services.Implementations
 
         public async Task DeleteStatusAsync(Guid id)
         {
+            if (await _unitOfWork.Statuses.IsStatusLinkedToAssignmentsAsync(id))
+                throw new InvalidOperationException("Cannot delete status as it is linked to assignments.");
+
             var status = await _unitOfWork.Statuses.GetByIdAsync(id);
             if (status == null)
                 throw new KeyNotFoundException("Status not found");
