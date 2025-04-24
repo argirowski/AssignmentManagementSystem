@@ -27,7 +27,9 @@ namespace Application.Services.Implementations
         {
             var category = await _unitOfWork.Categories.GetByIdAsync(id);
             if (category == null)
+            {
                 throw new KeyNotFoundException("No such Category exists.");
+            }
 
             return _mapper.Map<CategoryDTO?>(category);
         }

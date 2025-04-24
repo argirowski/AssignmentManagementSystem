@@ -1,50 +1,60 @@
-using System.Data;
 using Dapper;
 using Domain.Entities;
+using System.Data;
+using System.Threading.Tasks;
 
-public class EmployeeRepository : IEmployeeRepository
+namespace Persistence.Repositories
 {
-    private readonly IDbConnection _dbConnection;
-
-    public EmployeeRepository(IDbConnection dbConnection)
+    public class EmployeeRepository : IEmployeeRepository
     {
-        _dbConnection = dbConnection;
-    }
+        private readonly IDbConnection _connection;
 
-    public async Task<IEnumerable<Employee>> GetAllAsync()
-    {
-        const string query = "SELECT * FROM Employees";
-        return await _dbConnection.QueryAsync<Employee>(query);
-    }
+        public EmployeeRepository(IDbConnection connection)
+        {
+            _connection = connection;
+        }
 
-    public async Task<Employee> GetByIdAsync(Guid id)
-    {
-        const string query = "SELECT * FROM Employees WHERE Id = @Id";
-        return await _dbConnection.QuerySingleOrDefaultAsync<Employee>(query, new { Id = id });
-    }
+        public async Task<IEnumerable<Employee>> GetAllAsync()
+        {
+            const string query = "SELECT * FROM Employees";
+            return await _connection.QueryAsync<Employee>(query);
+        }
 
-    public async Task AddAsync(Employee employee)
-    {
-        const string query = "INSERT INTO Employees (Id, FullName, Email, DateJoined) VALUES (@Id, @FullName, @Email, @DateJoined)";
-        await _dbConnection.ExecuteAsync(query, employee);
-    }
+        public async Task<Employee> GetByIdAsync(Guid id)
+        {
+            const string query = "SELECT * FROM Employees WHERE Id = @Id";
+            return await _connection.QuerySingleOrDefaultAsync<Employee>(query, new { Id = id });
+        }
 
-    public void Update(Employee employee)
-    {
-        const string query = "UPDATE Employees SET FullName = @FullName, Email = @Email, DateJoined = @DateJoined WHERE Id = @Id";
-        _dbConnection.Execute(query, employee);
-    }
+        public async Task AddAsync(Employee employee)
+        {
+            const string query = "INSERT INTO Employees (Id, FullName, Email, DateJoined) VALUES (@Id, @FullName, @Email, @DateJoined)";
+            await _connection.ExecuteAsync(query, employee);
+        }
 
-    public void Remove(Employee employee)
-    {
-        const string query = "DELETE FROM Employees WHERE Id = @Id";
-        _dbConnection.Execute(query, new { employee.Id });
-    }
+        public void Update(Employee employee)
+        {
+            const string query = "UPDATE Employees SET FullName = @FullName, Email = @Email, DateJoined = @DateJoined WHERE Id = @Id";
+            _connection.Execute(query, employee);
+        }
 
-    public async Task<bool> IsEmployeeLinkedToAssignmentsAsync(Guid employeeId)
-    {
-        const string query = "SELECT COUNT(1) FROM Assignments WHERE EmployeeId = @EmployeeId";
-        var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { EmployeeId = employeeId });
-        return count > 0;
+        public void Remove(Employee employee)
+        {
+            const string query = "DELETE FROM Employees WHERE Id = @Id";
+            _connection.Execute(query, new { employee.Id });
+        }
+
+        public async Task<bool> IsEmployeeLinkedToAssignmentsAsync(Guid employeeId)
+        {
+            const string query = "SELECT COUNT(1) FROM Assignments WHERE EmployeeId = @EmployeeId";
+            var count = await _connection.ExecuteScalarAsync<int>(query, new { EmployeeId = employeeId });
+            return count > 0;
+        }
+
+        public async Task<Employee?> GetByFullNameAsync(string fullName)
+        {
+            var query = "SELECT * FROM Employees WHERE FullName = @FullName";
+            return await _connection.QueryFirstOrDefaultAsync<Employee>(query, new { FullName = fullName });
+        }
     }
 }

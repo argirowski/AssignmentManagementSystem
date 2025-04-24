@@ -23,7 +23,6 @@ public class EmployeeController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var employee = await _employeeService.GetEmployeeByIdAsync(id);
-        if (employee == null) return NotFound();
         return Ok(employee);
     }
 
@@ -37,32 +36,14 @@ public class EmployeeController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, EmployeeDTO employeeDTO)
     {
-        try
-        {
-            var updatedEmployee = await _employeeService.UpdateEmployeeAsync(id, employeeDTO);
-            return Ok(updatedEmployee);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        var updatedEmployee = await _employeeService.UpdateEmployeeAsync(id, employeeDTO);
+        return Ok(updatedEmployee);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        try
-        {
-            await _employeeService.DeleteEmployeeAsync(id);
-            return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        await _employeeService.DeleteEmployeeAsync(id);
+        return NoContent();
     }
 }

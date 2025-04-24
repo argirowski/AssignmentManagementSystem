@@ -8,4 +8,5 @@ public interface IEmployeeRepository
     void Update(Employee employee);
     void Remove(Employee employee);
     Task<bool> IsEmployeeLinkedToAssignmentsAsync(Guid categoryId);
+    Task<Employee?> GetByFullNameAsync(string fullName);
 }

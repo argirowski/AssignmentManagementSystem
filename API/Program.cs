@@ -33,6 +33,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<CategoryDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<StatusDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateStatusDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<EmployeeDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateEmployeeDTOValidator>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
