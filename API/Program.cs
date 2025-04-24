@@ -6,6 +6,10 @@ using Application.Mapping;
 using Application.Services.Interfaces;
 using Application.Services.Implementations;
 using Persistence.UnitOfWork;
+using Application.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,11 +27,19 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddAutoMapper(typeof(MappingProfiles));
 
+// Register FluentValidation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CategoryDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDTOValidator>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Add custom exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Seed the database
 using (var scope = app.Services.CreateScope())

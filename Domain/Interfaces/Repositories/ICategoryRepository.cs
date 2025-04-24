@@ -10,4 +10,5 @@ public interface ICategoryRepository
     Task UpdateAsync(Category category);
     Task DeleteAsync(Guid id);
     Task<bool> IsCategoryLinkedToAssignmentsAsync(Guid categoryId);
+    Task<Category?> GetByNameAsync(string name);
 }

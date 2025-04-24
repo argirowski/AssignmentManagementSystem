@@ -26,9 +26,6 @@ namespace API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var category = await _categoryService.GetCategoryByIdAsync(id);
-            if (category == null)
-                return NotFound();
-
             return Ok(category);
         }
 
@@ -42,33 +39,15 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, CategoryDTO categoryDTO)
         {
-            try
-            {
-                await _categoryService.UpdateCategoryAsync(id, categoryDTO);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            await _categoryService.UpdateCategoryAsync(id, categoryDTO);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                await _categoryService.DeleteCategoryAsync(id);
-                return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            await _categoryService.DeleteCategoryAsync(id);
+            return NoContent();
         }
     }
 }
