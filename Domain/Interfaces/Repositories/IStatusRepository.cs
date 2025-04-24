@@ -10,4 +10,5 @@ public interface IStatusRepository
     Task UpdateAsync(Status category);
     Task DeleteAsync(Guid id);
     Task<bool> IsStatusLinkedToAssignmentsAsync(Guid categoryId);
+    Task<Status?> GetByDescriptionAsync(string description);
 }

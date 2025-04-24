@@ -26,9 +26,6 @@ namespace API.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var status = await _statusService.GetStatusByIdAsync(id);
-            if (status == null)
-                return NotFound();
-
             return Ok(status);
         }
 
@@ -42,33 +39,15 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, StatusDTO statusDTO)
         {
-            try
-            {
-                await _statusService.UpdateStatusAsync(id, statusDTO);
-                return NoContent();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            await _statusService.UpdateStatusAsync(id, statusDTO);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            try
-            {
-                await _statusService.DeleteStatusAsync(id);
-                return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+            await _statusService.DeleteStatusAsync(id);
+            return NoContent();
         }
     }
 }

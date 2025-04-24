@@ -31,6 +31,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CategoryDTOValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<StatusDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateStatusDTOValidator>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
