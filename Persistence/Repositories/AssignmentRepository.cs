@@ -108,8 +108,43 @@ public class AssignmentRepository : IAssignmentRepository
 
     public async Task AddAsync(Assignment assignment)
     {
-        const string query = "INSERT INTO Assignments (Id, Title, Description, EmployeeId, StatusId) VALUES (@Id, @Title, @Description, @EmployeeId, @StatusId)";
-        await _dbConnection.ExecuteAsync(query, assignment);
+        const string assignmentQuery = "INSERT INTO Assignments (Id, Title, Description, EmployeeId, StatusId, IsCompleted, CreatedAt) VALUES (@Id, @Title, @Description, @EmployeeId, @StatusId, @IsCompleted, @CreatedAt)";
+        const string categoryLinkQuery = "INSERT INTO AssignmentCategories (AssignmentId, CategoryId) VALUES (@AssignmentId, @CategoryId)";
+
+        using (var transaction = _dbConnection.BeginTransaction())
+        {
+            try
+            {
+                // Insert Assignment
+                await _dbConnection.ExecuteAsync(assignmentQuery, new
+                {
+                    assignment.Id,
+                    assignment.Title,
+                    assignment.Description,
+                    EmployeeId = assignment.Employee.Id,
+                    StatusId = assignment.Status.Id,
+                    IsCompleted = assignment.IsCompleted,
+                    CreatedAt = assignment.CreatedAt
+                }, transaction);
+
+                // Link Categories
+                foreach (var category in assignment.AssignmentCategories)
+                {
+                    await _dbConnection.ExecuteAsync(categoryLinkQuery, new
+                    {
+                        AssignmentId = assignment.Id,
+                        CategoryId = category.CategoryId
+                    }, transaction);
+                }
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
     }
 
     public void Update(Assignment assignment)

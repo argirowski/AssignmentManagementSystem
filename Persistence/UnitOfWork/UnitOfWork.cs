@@ -16,6 +16,10 @@ namespace Persistence.UnitOfWork
         public UnitOfWork(IDbConnection dbConnection)
         {
             _dbConnection = dbConnection;
+            if (_dbConnection.State == ConnectionState.Closed)
+            {
+                _dbConnection.Open();
+            }
         }
 
         public ICategoryRepository Categories => _categoryRepository ??= new CategoryRepository(_dbConnection);

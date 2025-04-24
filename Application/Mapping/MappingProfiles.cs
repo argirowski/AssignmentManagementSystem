@@ -23,6 +23,11 @@ namespace Application.Mapping
                 .ForMember(dest => dest.Employee, opt => opt.MapFrom(src => src.Employee))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.AssignmentCategories.Select(ac => ac.Category)));
+
+            CreateMap<CreateAssignmentDTO, Assignment>()
+                .ForMember(dest => dest.Employee, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
+                .ForMember(dest => dest.AssignmentCategories, opt => opt.Ignore());
         }
     }
 }
