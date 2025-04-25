@@ -1,4 +1,3 @@
-using Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
