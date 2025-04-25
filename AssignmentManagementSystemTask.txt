@@ -29,6 +29,14 @@ Many Categories via AssignmentCategories
 Many-to-many relationship between Assignments and Categories
 When an assignment is deleted, its category links are deleted automatically via ON DELETE CASCADE.
 
+🔗 Relationship Summary
+
+Relationship						Type
+Employee → Assignments				One-to-Many
+Status → Assignments				One-to-Many
+Category ↔ Assignment				Many-to-Many
+Assignment → AssignmentCategories	One-to-Many (join)
+
 This system should demonstrate the ability to manage relationships in a database and reflect them in both backend logic and frontend state management
 
 📌 Functional Requirements:
