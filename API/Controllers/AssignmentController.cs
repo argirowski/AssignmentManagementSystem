@@ -23,22 +23,14 @@ public class AssignmentController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var assignment = await _assignmentService.GetByIdAsync(id);
-        if (assignment == null) return NotFound();
         return Ok(assignment);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateAssignmentDTO createAssignmentDto)
     {
-        try
-        {
-            var createdAssignment = await _assignmentService.CreateAsync(createAssignmentDto);
-            return CreatedAtAction(nameof(GetById), new { id = createdAssignment.Id }, createdAssignment);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var createdAssignment = await _assignmentService.CreateAsync(createAssignmentDto);
+        return CreatedAtAction(nameof(GetById), new { id = createdAssignment.Id }, createdAssignment);
     }
 
     [HttpPut("{id}")]
@@ -58,14 +50,7 @@ public class AssignmentController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        try
-        {
-            await _assignmentService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        await _assignmentService.DeleteAsync(id);
+        return NoContent();
     }
 }

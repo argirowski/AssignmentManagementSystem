@@ -155,7 +155,26 @@ public class AssignmentRepository : IAssignmentRepository
 
     public void Remove(Assignment assignment)
     {
-        const string query = "DELETE FROM Assignments WHERE Id = @Id";
-        _dbConnection.Execute(query, new { assignment.Id });
+        const string deleteAssignmentCategoriesQuery = "DELETE FROM AssignmentCategories WHERE AssignmentId = @Id";
+        const string deleteAssignmentQuery = "DELETE FROM Assignments WHERE Id = @Id";
+
+        using (var transaction = _dbConnection.BeginTransaction())
+        {
+            try
+            {
+                // Delete related AssignmentCategories
+                _dbConnection.Execute(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
+
+                // Delete the Assignment
+                _dbConnection.Execute(deleteAssignmentQuery, new { assignment.Id }, transaction);
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
     }
 }

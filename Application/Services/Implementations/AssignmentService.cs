@@ -23,25 +23,36 @@ public class AssignmentService : IAssignmentService
     public async Task<AssignmentDTO> GetByIdAsync(Guid id)
     {
         var assignment = await _unitOfWork.Assignments.GetByIdAsync(id);
+        if (assignment == null)
+        {
+            throw new KeyNotFoundException("No such Assignment exists.");
+        }
+
         return _mapper.Map<AssignmentDTO>(assignment);
     }
 
     public async Task<AssignmentDTO> CreateAsync(CreateAssignmentDTO createAssignmentDto)
     {
-        // Validate Employee
         var employee = await _unitOfWork.Employees.GetByIdAsync(createAssignmentDto.EmployeeId);
-        if (employee == null) throw new ArgumentException("Invalid Employee ID");
+        if (employee == null)
+        {
+            throw new ArgumentException("The Employee you are trying to assign does not exist.");
+        }
 
-        // Validate Status
         var status = await _unitOfWork.Statuses.GetByIdAsync(createAssignmentDto.StatusId);
-        if (status == null) throw new ArgumentException("Invalid Status ID");
+        if (status == null)
+        {
+            throw new ArgumentException("The Status you are trying to assign does not exist.");
+        }
 
-        // Validate Categories
         var categories = new List<Category>();
         foreach (var categoryId in createAssignmentDto.CategoryIds)
         {
             var category = await _unitOfWork.Categories.GetByIdAsync(categoryId);
-            if (category == null) throw new ArgumentException($"Invalid Category ID: {categoryId}");
+            if (category == null)
+            {
+                throw new ArgumentException($"The Category with ID {categoryId} does not exist.");
+            }
             categories.Add(category);
         }
 
@@ -70,7 +81,10 @@ public class AssignmentService : IAssignmentService
     public async Task<AssignmentDTO> UpdateAsync(Guid id, AssignmentDTO assignmentDto)
     {
         var assignment = await _unitOfWork.Assignments.GetByIdAsync(id);
-        if (assignment == null) throw new KeyNotFoundException("Assignment not found");
+        if (assignment == null)
+        {
+            throw new KeyNotFoundException("The Assignment you are trying to update does not exist.");
+        }
 
         _mapper.Map(assignmentDto, assignment);
         _unitOfWork.Assignments.Update(assignment);
@@ -81,7 +95,10 @@ public class AssignmentService : IAssignmentService
     public async Task DeleteAsync(Guid id)
     {
         var assignment = await _unitOfWork.Assignments.GetByIdAsync(id);
-        if (assignment == null) throw new KeyNotFoundException("Assignment not found");
+        if (assignment == null)
+        {
+            throw new KeyNotFoundException("The Assignment you are trying to delete does not exist.");
+        }
 
         _unitOfWork.Assignments.Remove(assignment);
         await _unitOfWork.CompleteAsync();
