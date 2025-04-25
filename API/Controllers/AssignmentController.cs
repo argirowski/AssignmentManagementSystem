@@ -34,17 +34,10 @@ public class AssignmentController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, AssignmentDTO assignmentDto)
+    public async Task<IActionResult> Update(Guid id, CreateAssignmentDTO updateAssignmentDTO)
     {
-        try
-        {
-            var updatedAssignment = await _assignmentService.UpdateAsync(id, assignmentDto);
-            return Ok(updatedAssignment);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        var updatedAssignment = await _assignmentService.UpdateAsync(id, updateAssignmentDTO);
+        return Ok(updatedAssignment);
     }
 
     [HttpDelete("{id}")]

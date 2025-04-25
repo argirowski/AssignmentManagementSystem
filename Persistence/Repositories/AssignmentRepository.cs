@@ -149,8 +149,46 @@ public class AssignmentRepository : IAssignmentRepository
 
     public void Update(Assignment assignment)
     {
-        const string query = "UPDATE Assignments SET Title = @Title, Description = @Description, EmployeeId = @EmployeeId, StatusId = @StatusId WHERE Id = @Id";
-        _dbConnection.Execute(query, assignment);
+        const string updateAssignmentQuery = "UPDATE Assignments SET Title = @Title, Description = @Description, EmployeeId = @EmployeeId, StatusId = @StatusId, IsCompleted = @IsCompleted WHERE Id = @Id";
+        const string deleteAssignmentCategoriesQuery = "DELETE FROM AssignmentCategories WHERE AssignmentId = @Id";
+        const string insertAssignmentCategoriesQuery = "INSERT INTO AssignmentCategories (AssignmentId, CategoryId) VALUES (@AssignmentId, @CategoryId)";
+
+        using (var transaction = _dbConnection.BeginTransaction())
+        {
+            try
+            {
+                // Update the Assignment
+                _dbConnection.Execute(updateAssignmentQuery, new
+                {
+                    assignment.Id,
+                    assignment.Title,
+                    assignment.Description,
+                    EmployeeId = assignment.Employee.Id,
+                    StatusId = assignment.Status.Id,
+                    assignment.IsCompleted
+                }, transaction);
+
+                // Delete existing AssignmentCategories
+                _dbConnection.Execute(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
+
+                // Insert updated AssignmentCategories
+                foreach (var category in assignment.AssignmentCategories)
+                {
+                    _dbConnection.Execute(insertAssignmentCategoriesQuery, new
+                    {
+                        AssignmentId = assignment.Id,
+                        CategoryId = category.CategoryId
+                    }, transaction);
+                }
+
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
     }
 
     public void Remove(Assignment assignment)
