@@ -35,6 +35,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Add CORS
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader()
+        .AllowAnyMethod()
+        .WithOrigins("http://localhost:4000");
+    });
+});
+
 var app = builder.Build();
 
 // Add custom exception handling middleware
@@ -59,9 +70,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("CorsPolicy"); // enable CORS => This should come before UseHttpsRedirection
 
-app.UseAuthorization();
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

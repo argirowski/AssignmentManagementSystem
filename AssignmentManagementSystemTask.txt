@@ -5,38 +5,69 @@
 🔹 Backend: .NET Core with Dapper for database interaction.
 🔹 Frontend: React with TypeScript and Redux for state management.
 🔹 Patterns: Implement the Repository Pattern with the Unit of Work Pattern.
-🔹 Relationships: Include a one-to-many relationship between employees and assignments (One employee can have many assignments. Each assignment, however, belongs to exactly one employee), and a many-to-many relationship between assignments and tags (A single assignment can have many tags. Similarly, a single tag can belong to multiple assignments).
+🔹 Relationships: Include a one-to-many relationship between employees and assignments (One employee can have many assignments. Each assignment, however, belongs to exactly one employee), and a one-to-many relationship between statuses and assignments (One status can be assigned to many assignments, but each assignment has only one status). Also include a many-to-many relationship between assignments and categories (A single assignment can have many categories, and a single category can belong to multiple assignments), implemented through a one-to-many relationship between assignments and assignment-category join entities.
+
+🧱 ENTITY: Employees
+One Employee can have many Assignments.
+Cannot delete if referenced by an assignment.
+
+🧱 ENTITY: Statuses
+One Status can be linked to many Assignments.
+Cannot delete if in use (only if not used by an assignment).
+
+🧱 ENTITY: Categories
+Categories are shared tags, and linked to assignments via a many-to-many join table.
+Cannot delete if in use (only if not used by an assignment).
+
+🧱 ENTITY: Assignments
+Links to:
+One Employee
+One Status
+Many Categories via AssignmentCategories
+
+🧱 ENTITY: AssignmentCategories (Join Table)
+Many-to-many relationship between Assignments and Categories
+When an assignment is deleted, its category links are deleted automatically via ON DELETE CASCADE.
 
 This system should demonstrate the ability to manage relationships in a database and reflect them in both backend logic and frontend state management
 
 📌 Functional Requirements:
 ➡️ Employee Features:
-🔹 An employees should only see, add, update, or delete assignments associated with them.
 🔹 Each assignment should belong to exactly one employee.
 🔹 Each employee should have:
 ✔ Employee ID: Unique identifier.
-✔ Name: The employee's full name. This could be used for display purposes.
-✔ Email: The employee's email address. It must be unique to avoid duplicate employee entries.
+✔ FullName: The employee's full name (used for display purposes).
+✔ Email: The employee's email address (must be unique to prevent duplicates).
 
 ➡️ Assignment Features:
 🔹 Each assignment should have:
-✔ Task ID: Unique identifier.
-✔ Title: Short title for the assignment (max 255 characters).
-✔ Description: Optional detailed information about the assignment.
-✔ IsCompleted: Boolean flag to indicate whether the assignment is completed.
-✔ CreatedAt: Timestamp of creation.
-✔ Tags: Option to associate multiple tags with a assignment.
+✔ Assignment ID: Unique identifier.
+✔ Title: Short title for the assignment.
+✔ Description: Detailed information about the assignment.
+✔ IsCompleted: Boolean flag indicating whether the assignment is completed.
+✔ CreatedAt: Timestamp of assignment creation.
+✔ EmployeeId: Link to the employee who owns the assignment.
+✔ StatusId: Link to the status of the assignment.
+✔ Categories: Ability to associate multiple categories with an assignment (Many-to-Many relationship).
 
-➡️ Tag Features:
-✔ Employees can create and assign tags to assignments.
-✔ A tag can belong to multiple assignments, and a assignment can have multiple tags (Many-to-Many relationship).
-🔹 Each tag should have:
-✔ Tag ID: Unique identifier.
-✔ Name: Name of the tag.
+➡️ Category Features:
+✔ A category can belong to multiple assignments, and an assignment can have multiple categories (Many-to-Many relationship).
+🔹 Each category should have:
+✔ Category ID: Unique identifier.
+✔ Name: Name of the category.
+
+➡️ Status Features:
+✔ Each assignment must be linked to a status.
+✔ A status can be shared by multiple assignments.
+🔹 Each status should have:
+✔ Status ID: Unique identifier.
+✔ Description: Description of the status.
 
 ➡️ Assignment State Management:
-✔ Use Redux to manage state, with actions and reducers for assignments, employees, and tags.
-✔ Dispatch actions such as ADD_ASSIGNMENT, UPDATE_ASSIGNMENT, DELETE_ASSIGNMENT, ADD_ASSIGNMENT, ASSIGN_ASSIGNMENT.
+✔ Use Redux to manage application state, with actions and reducers for assignments, employees, statuses, and categories.
+✔ Dispatch actions such as ADD_ASSIGNMENT, UPDATE_ASSIGNMENT, DELETE_ASSIGNMENT, SET_ASSIGNMENTS, SET_EMPLOYEES, SET_STATUSES, and SET_CATEGORIES.
+✔ Fetch data from the API using asynchronous actions (e.g., with redux-thunk or redux-toolkit) and update the store accordingly.
+✔ Connect React components to the Redux store using useSelector to access state and useDispatch to trigger actions.
 
 ➡️ Routing with React Router:
 ✔ Use React Router for navigation between pages.
@@ -46,34 +77,46 @@ This system should demonstrate the ability to manage relationships in a database
 
 ➡️ API Endpoints:
 ✔ Employee Management:
-🔹 POST/employees - Add a new employee.
-🔹 GET/employees/{id}/assignments - Fetch assignments for a specific employee.
+🔹 POST /api/employees – Add a new employee.
+🔹 GET /api/employees/{id}/assignments – Fetch assignments for a specific employee.
+🔹 GET /api/employees – Fetch all employees.
+🔹 GET /api/employees/{id} – Fetch a specific employee.
+🔹 PUT /api/employees/{id} – Update an employee.
+🔹 DELETE /api/employees/{id} – Delete an employee (only if not linked to assignments).
 
-✔ Task Management:
-🔹 GET/assignments - Fetch all assignments.
-🔹 GET/assignments{id} - Fetch a specific assignment.
-🔹 POST/assignments - Add a new assignment.
-🔹 PUT/assignments/{id} - Update a assignment.
-🔹 DELETE/assignments/{id} - Delete a assignment.
+✔ Category Management:
+🔹 GET /api/categories – Fetch all categories.
+🔹 GET /api/categories/{id} – Fetch a specific category.
+🔹 POST /api/categories – Create a new category.
+🔹 PUT /api/categories/{id} – Update a category.
+🔹 DELETE /api/categories/{id} – Delete a category (only if not used in any assignment).
 
-✔ Tag Management:
-🔹 POST/tags - Create a new tag.
-🔹 GET/tags - Fetch all tags.
-🔹 POST/assignments/{assignmentId}/tags - Assign a tag to a assignment.
-🔹 GET/assignments/{assignmentId}/tags - Fetch all tags for a assignment.
+✔ Status Management:
+🔹 GET /api/statuses – Fetch all statuses.
+🔹 GET /api/statuses/{id} – Fetch a specific status.
+🔹 POST /api/statuses – Create a new status.
+🔹 PUT /api/statuses/{id} – Update a status.
+🔹 DELETE /api/statuses/{id} – Delete a status (only if not linked to assignments).
+
+✔ Assignment Management:
+🔹 GET /api/assignments – Fetch all assignments.
+🔹 GET /api/assignments/{id} – Fetch a specific assignment.
+🔹 POST /api/assignments – Add a new assignment.
+🔹 PUT /api/assignments/{id} – Update an assignment.
+🔹 DELETE /api/assignments/{id} – Delete an assignment (first removes related records from AssignmentCategories, then deletes the assignment itself).
 
 📌 Technical Requirements:
 ✅ Backend:
-🔹 Implement repositories for Employees, Assignments, and Tags.
+🔹 Implement repositories for Employees, Assignments, Statuses, and Categories.
 🔹 Use the Unit of Work pattern to manage transactions between assignments and tags.
 
 ✅ Frontend:
 🔹 Use TypeScript for strict type checking.
-🔹 Build Redux actions, reducers, and selectors for employees, assignments, and tags.
+🔹 Build Redux actions, reducers, and selectors for employees, assignments, and categories.
 
 ✅ State and Data Flow:
-🔹 Use Redux to manage state for assignments, employees, and tags.
-🔹 Implement useSelector()  hooks to fetch filtered data (e.g., assignments by employee or assignments by tag).
+🔹 Use Redux to manage state for assignments, employees and category.
+🔹 Implement useSelector()  hooks to fetch filtered data (e.g., assignments by employee or assignments by category).
 🔹 Use Redux Thunk or middleware to handle async API calls.
 
 ✅ Validation:
@@ -88,7 +131,7 @@ If time allows, implement the following optional features:
 🔹 Add sorting (e.g.,by CreatedAt or Title).
 
 ✅ Filtering:
-🔹 Filter assignments by tags or completion status.
+🔹 Filter assignments by cateogry or status.
 
 ✅ Test Coverage:
 ✔ Backend Unit and Integration Tests:
