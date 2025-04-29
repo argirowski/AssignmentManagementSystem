@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Button, Table, Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 type Employee = {
   id: number;
@@ -22,7 +24,6 @@ type Assignment = {
   title: string;
   description: string;
   isCompleted: boolean;
-  createdAt: string;
   employee: Employee;
   status: Status;
   categories: Category[];
@@ -30,6 +31,7 @@ type Assignment = {
 
 const Assignments: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -47,46 +49,61 @@ const Assignments: React.FC = () => {
   }, []);
 
   return (
-    <div className="assignments">
-      <h2>Assignments</h2>
-      <ul>
-        {assignments.map(
-          ({
-            id,
-            title,
-            description,
-            isCompleted,
-            createdAt,
-            employee,
-            status,
-            categories,
-          }) => (
-            <li key={id}>
-              <h3>{title}</h3>
-              <p>{description}</p>
-              <p>
-                <strong>Completed:</strong> {isCompleted ? "Yes" : "No"}
-              </p>
-              <p>
-                <strong>Created At:</strong>{" "}
-                {new Date(createdAt).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Employee:</strong> {employee.fullName} ({employee.email}
-                )
-              </p>
-              <p>
-                <strong>Status:</strong> {status.description}
-              </p>
-              <p>
-                <strong>Categories:</strong>{" "}
-                {categories.map((category) => category.name).join(", ")}
-              </p>
-            </li>
-          )
-        )}
-      </ul>
-    </div>
+    <Container>
+      <div className="assignments">
+        <h2>Assignments</h2>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Completed</th>
+              <th>Employee</th>
+              <th>Status</th>
+              <th>Categories</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {assignments.map(
+              ({
+                id,
+                title,
+                description,
+                isCompleted,
+                employee,
+                status,
+                categories,
+              }) => (
+                <tr key={id}>
+                  <td>{title}</td>
+                  <td>{description}</td>
+                  <td>{isCompleted ? "Yes" : "No"}</td>
+
+                  <td>
+                    {employee.fullName} ({employee.email})
+                  </td>
+                  <td>{status.description}</td>
+                  <td>
+                    {categories.map((category) => category.name).join(", ")}
+                  </td>
+                  <td>
+                    <Button
+                      variant="success me-2"
+                      onClick={() => navigate(`/assignments/${id}`)}
+                    >
+                      View
+                    </Button>
+                    <Button variant="warning me-2">Edit</Button>
+                    <Button variant="danger me-2">Delete</Button>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </Table>
+      </div>
+    </Container>
   );
 };
 
