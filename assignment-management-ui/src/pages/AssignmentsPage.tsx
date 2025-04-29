@@ -2,34 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { Assignment } from "../types/types";
 
-type Employee = {
-  id: number;
-  fullName: string;
-  email: string;
-};
 
-type Status = {
-  id: number;
-  description: string;
-};
 
-type Category = {
-  id: number;
-  name: string;
-};
-
-type Assignment = {
-  id: number;
-  title: string;
-  description: string;
-  isCompleted: boolean;
-  employee: Employee;
-  status: Status;
-  categories: Category[];
-};
-
-const Assignments: React.FC = () => {
+const AssignmentsPage: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const navigate = useNavigate();
 
@@ -107,4 +84,4 @@ const Assignments: React.FC = () => {
   );
 };
 
-export default Assignments;
+export default AssignmentsPage;

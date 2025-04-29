@@ -2,14 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Card, Button } from "react-bootstrap";
-
-type Employee = {
-  name: string;
-  position: string;
-  department: string;
-  email: string;
-  phone: string;
-};
+import { Employee } from "../../types/types";
 
 const EmployeeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,19 +34,10 @@ const EmployeeDetails: React.FC = () => {
         <Card.Body>
           <Card.Title>Employee Details</Card.Title>
           <Card.Text>
-            <strong>Name:</strong> {employee.name}
-          </Card.Text>
-          <Card.Text>
-            <strong>Position:</strong> {employee.position}
-          </Card.Text>
-          <Card.Text>
-            <strong>Department:</strong> {employee.department}
+            <strong>Full Name:</strong> {employee.fullName}
           </Card.Text>
           <Card.Text>
             <strong>Email:</strong> {employee.email}
-          </Card.Text>
-          <Card.Text>
-            <strong>Phone:</strong> {employee.phone}
           </Card.Text>
         </Card.Body>
       </Card>

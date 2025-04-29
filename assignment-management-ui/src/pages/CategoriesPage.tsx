@@ -1,14 +1,10 @@
 import { Button, Table, Container } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Category } from "../types/types";
 
-type Category = {
-  id: number;
-  name: string;
-};
-
-const Categories: React.FC = () => {
+const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const navigate = useNavigate();
 
@@ -59,9 +55,15 @@ const Categories: React.FC = () => {
             ))}
           </tbody>
         </Table>
+        <div className="mt-4 text-start">
+          <p>
+            Want to add a new category?{" "}
+            <Link to="/categories/new">Click here</Link>
+          </p>
+        </div>
       </div>
     </Container>
   );
 };
 
-export default Categories;
+export default CategoriesPage;

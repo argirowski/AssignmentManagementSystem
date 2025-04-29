@@ -1,58 +1,51 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table, Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { Status } from "../types/types";
 
-type Employee = {
-  id: number;
-  fullName: string;
-  email: string;
-};
-
-const Employee: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+const StatusesPage: React.FC = () => {
+  const [statuses, setStatuses] = useState<Status[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchStatuses = async () => {
       try {
-        const response = await axios.get("http://localhost:5088/api/Employee");
-        setEmployees(response.data);
+        const response = await axios.get("http://localhost:5088/api/Status");
+        setStatuses(response.data);
       } catch (error) {
-        console.error("Error fetching employees:", error);
+        console.error("Error fetching statuses:", error);
       }
     };
 
-    fetchEmployees();
+    fetchStatuses();
   }, []);
 
   return (
     <Container>
-      <div className="employee-list">
-        <h2>Employees</h2>
+      <div className="statuses">
+        <h2>Statuses</h2>
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Full Name</th>
-              <th>Email</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {employees.map(({ id, fullName, email }) => (
+            {statuses.map(({ id, description }) => (
               <tr key={id}>
-                <td>{fullName}</td>
-                <td>{email}</td>
+                <td>{description}</td>
                 <td>
                   <Button
                     variant="success me-2"
-                    onClick={() => navigate(`/employees/${id}`)}
+                    onClick={() => navigate(`/statuses/${id}`)}
                   >
                     View
                   </Button>
                   <Button
                     variant="warning me-2"
-                    onClick={() => navigate(`/employees/${id}/edit`)}
+                    onClick={() => navigate(`/statuses/${id}/edit`)}
                   >
                     Edit
                   </Button>
@@ -62,9 +55,14 @@ const Employee: React.FC = () => {
             ))}
           </tbody>
         </Table>
+        <div className="mt-4 text-start">
+          <p>
+            Want to add a new status? <Link to="/statuses/new">Click here</Link>
+          </p>
+        </div>
       </div>
     </Container>
   );
 };
 
-export default Employee;
+export default StatusesPage;

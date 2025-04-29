@@ -2,11 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button, ButtonGroup } from "react-bootstrap";
 import axios from "axios";
-
-type Category = {
-  id: number;
-  name: string;
-};
+import { Category } from "../../types/types";
 
 const CategoryDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

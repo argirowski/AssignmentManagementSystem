@@ -2,13 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
 import axios from "axios";
+import { Status } from "../../types/types";
 
-type Status = {
-  id: number;
-  description: string;
-};
-
-const EditStatus: React.FC = () => {
+const EditStatusForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [status, setStatus] = useState<Status | null>(null);
   const [description, setDescription] = useState("");
@@ -73,4 +69,4 @@ const EditStatus: React.FC = () => {
   );
 };
 
-export default EditStatus;
+export default EditStatusForm;

@@ -2,13 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
 import axios from "axios";
+import { Category } from "../../types/types";
 
-type Category = {
-  id: number;
-  name: string;
-};
-
-const EditCategory: React.FC = () => {
+const EditCategoryForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [category, setCategory] = useState<Category | null>(null);
   const [name, setName] = useState("");
@@ -71,4 +67,4 @@ const EditCategory: React.FC = () => {
   );
 };
 
-export default EditCategory;
+export default EditCategoryForm;

@@ -4,19 +4,23 @@ import { Container, Card, Button } from "react-bootstrap";
 import axios from "axios";
 
 type Employee = {
+  id: number;
   fullName: string;
   email: string;
 };
 
 type Status = {
+  id: number;
   description: string;
 };
 
 type Category = {
+  id: number;
   name: string;
 };
 
 type Assignment = {
+  id: number;
   title: string;
   description: string;
   isCompleted: boolean;

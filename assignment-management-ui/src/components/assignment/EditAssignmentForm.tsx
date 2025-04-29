@@ -2,33 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
 import axios from "axios";
+import { Assignment, Category, Employee, Status } from "../../types/types";
 
-type Employee = {
-  id: number;
-  fullName: string;
-  email: string;
-};
-
-type Status = {
-  id: number;
-  description: string;
-};
-
-type Category = {
-  id: number;
-  name: string;
-};
-
-type Assignment = {
-  title: string;
-  description: string;
-  isCompleted: boolean;
-  employeeId: number;
-  statusId: number;
-  categoryIds: number[];
-};
-
-const EditAssignment: React.FC = () => {
+const EditAssignmentForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [title, setTitle] = useState("");
@@ -198,4 +174,4 @@ const EditAssignment: React.FC = () => {
   );
 };
 
-export default EditAssignment;
+export default EditAssignmentForm;

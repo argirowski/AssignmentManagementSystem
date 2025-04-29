@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Container, Card, ButtonGroup, Button } from "react-bootstrap";
+import { Container, Card, Button } from "react-bootstrap";
 import axios from "axios";
-
-type Status = {
-  id: number;
-  description: string;
-};
+import { Status } from "../../types/types";
 
 const StatusDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
