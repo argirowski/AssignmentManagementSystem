@@ -1,0 +1,7 @@
+body {
+  background: linear-gradient(
+    135deg,
+    #ffe6e6,
+    #ffcccc
+  ); /* Gradient with soft shades of red */
+}
