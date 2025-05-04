@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table, Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Assignment } from "../types/types";
-
-
 
 const AssignmentsPage: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
@@ -57,9 +55,7 @@ const AssignmentsPage: React.FC = () => {
                   <td>{description}</td>
                   <td>{isCompleted ? "Yes" : "No"}</td>
 
-                  <td>
-                    {employee.fullName} ({employee.email})
-                  </td>
+                  <td>{employee.fullName}</td>
                   <td>{status.description}</td>
                   <td>
                     {categories.map((category) => category.name).join(", ")}
@@ -71,7 +67,12 @@ const AssignmentsPage: React.FC = () => {
                     >
                       View
                     </Button>
-                    <Button variant="warning me-2">Edit</Button>
+                    <Button
+                      variant="warning me-2"
+                      onClick={() => navigate(`/assignments/${id}/edit`)}
+                    >
+                      Edit
+                    </Button>
                     <Button variant="danger me-2">Delete</Button>
                   </td>
                 </tr>
@@ -79,6 +80,12 @@ const AssignmentsPage: React.FC = () => {
             )}
           </tbody>
         </Table>
+        <div className="mt-4 text-start">
+          <p>
+            Want to add a new assignment?
+            <Link to="/assignments/new">Click here</Link>
+          </p>
+        </div>
       </div>
     </Container>
   );

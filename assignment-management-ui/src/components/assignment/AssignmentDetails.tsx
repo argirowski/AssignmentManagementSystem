@@ -55,7 +55,9 @@ const AssignmentDetails: React.FC = () => {
   }
 
   return (
-    <Container>
+    <Container
+      style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
+    >
       <Card className="mt-4">
         <Card.Body>
           <Card.Title>Assignment Details</Card.Title>
@@ -85,12 +87,22 @@ const AssignmentDetails: React.FC = () => {
           </Card.Text>
         </Card.Body>
       </Card>
-      <div className="d-flex justify-content-between mt-4">
-        <Button variant="secondary" onClick={() => window.history.back()}>
+      <div
+        className="d-flex justify-content-start mt-2"
+        style={{ gap: "1rem" }}
+      >
+        <Button
+          variant="secondary"
+          size="lg"
+          style={{ maxWidth: "10rem" }}
+          onClick={() => window.history.back()}
+        >
           Go Back
         </Button>
         <Button
           variant="primary"
+          size="lg"
+          style={{ maxWidth: "10rem" }}
           onClick={() => navigate(`/assignments/${id}/edit`)}
         >
           Edit

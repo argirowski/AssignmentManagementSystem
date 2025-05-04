@@ -57,7 +57,7 @@ const CategoriesPage: React.FC = () => {
         </Table>
         <div className="mt-4 text-start">
           <p>
-            Want to add a new category?{" "}
+            Want to add a new category?
             <Link to="/categories/new">Click here</Link>
           </p>
         </div>

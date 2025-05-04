@@ -15,6 +15,7 @@ import EditAssignmentForm from "../components/assignment/EditAssignmentForm";
 import AddCategoryForm from "../components/category/AddCategoryForm";
 import AddStatusForm from "../components/status/AddStatusForm";
 import AddEmployeeForm from "../components/employee/AddEmployeeForm";
+import AddAssignmentForm from "../components/assignment/AddAssignmentForm";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/employees/:id" element={<EmployeeDetails />} />
       <Route path="/employees/:id/edit" element={<EditEmployeeForm />} />
       <Route path="/assignments" element={<AssignmentsPage />} />
+      <Route path="/assignments/new" element={<AddAssignmentForm />} />
       <Route path="/assignments/:id" element={<AssignmentDetails />} />
       <Route path="/assignments/:id/edit" element={<EditAssignmentForm />} />
       <Route path="/statuses" element={<StatusesPage />} />
