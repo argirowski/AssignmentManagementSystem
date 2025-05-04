@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
 import { Category } from "../../types/types";
-import { fetchCategoryById } from "../../api/categoryApi";
+import { fetchCategoryById } from "../../utils/api/categoryApi";
 
 const CategoryDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,7 +38,6 @@ const CategoryDetails: React.FC = () => {
           </Card.Text>
         </Card.Body>
       </Card>
-
       <div
         className="d-flex justify-content-start mt-2"
         style={{ gap: "1rem" }}

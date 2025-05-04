@@ -1,66 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import { Employee } from "../../types/types";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fetchEmployeeById, updateEmployee } from "../../api/employeeApi";
-import ConfirmCancelModal from "../ConfirmCancelModal";
+import { addEmployee } from "../../utils/api/employeeApi";
+import ConfirmCancelModal from "../../components/ConfirmCancelModal";
+import { employeeSchema, EmployeeFormData } from "../../utils/validation";
 
-const schema = z.object({
-  fullName: z
-    .string()
-    .min(1, "Full Name is required")
-    .max(100, "Full Name must be less than 100 characters"),
-  email: z
-    .string()
-    .email("Invalid email address")
-    .min(1, "Email is required")
-    .max(100, "Email must be less than 100 characters"),
-});
-
-type FormData = z.infer<typeof schema>;
-
-const EditEmployeeForm: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [employee, setEmployee] = useState<Employee | null>(null);
-  const navigate = useNavigate();
-
+const AddEmployeeForm: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
+  } = useForm<EmployeeFormData>({
+    resolver: zodResolver(employeeSchema),
     defaultValues: { fullName: "", email: "" },
   });
 
   const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        const data = await fetchEmployeeById(id!);
-        setEmployee(data);
-        reset({ fullName: data.fullName, email: data.email });
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
-
-    fetchEmployee();
-  }, [id, reset]);
-
-  const onSubmit = async (data: FormData) => {
-    try {
-      await updateEmployee(id!, { id: employee?.id!, ...data });
-      navigate(`/employees`);
-    } catch (error) {
-      console.error("Error updating employee:", error);
-    }
-  };
+  const navigate = useNavigate();
 
   const handleCancel = () => {
     if (isDirty) {
@@ -79,9 +37,14 @@ const EditEmployeeForm: React.FC = () => {
     setShowModal(false);
   };
 
-  if (!employee) {
-    return <p>Loading...</p>;
-  }
+  const onSubmit = async (data: EmployeeFormData) => {
+    try {
+      await addEmployee({ ...data });
+      navigate("/employees");
+    } catch (error) {
+      console.error("Error adding employee:", error);
+    }
+  };
 
   return (
     <Container
@@ -89,7 +52,7 @@ const EditEmployeeForm: React.FC = () => {
     >
       <Card className="mt-4">
         <Card.Body>
-          <h2 className="text-start">Edit Employee</h2>
+          <h2 className="text-start">Add New Employee</h2>
           <Form onSubmit={handleSubmit(onSubmit)} className="mt-4 text-start">
             <Form.Group className="mb-3" controlId="formEmployeeFullName">
               <Form.Label>
@@ -119,26 +82,31 @@ const EditEmployeeForm: React.FC = () => {
                 {errors.email?.message}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button
-              variant="primary"
-              size="lg"
-              style={{ maxWidth: "10rem" }}
-              type="submit"
-            >
-              Save
-            </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              style={{ maxWidth: "10rem", marginLeft: "1rem" }}
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
           </Form>
         </Card.Body>
       </Card>
-
+      <div
+        className="d-flex justify-content-start mt-2"
+        style={{ gap: "1rem" }}
+      >
+        <Button
+          variant="primary"
+          size="lg"
+          type="submit"
+          style={{ maxWidth: "15rem" }}
+          onClick={handleSubmit(onSubmit)}
+        >
+          Add Employee
+        </Button>
+        <Button
+          variant="secondary"
+          size="lg"
+          style={{ maxWidth: "15rem" }}
+          onClick={handleCancel}
+        >
+          Cancel
+        </Button>
+      </div>
       <ConfirmCancelModal
         show={showModal}
         onConfirm={confirmCancel}
@@ -148,4 +116,4 @@ const EditEmployeeForm: React.FC = () => {
   );
 };
 
-export default EditEmployeeForm;
+export default AddEmployeeForm;

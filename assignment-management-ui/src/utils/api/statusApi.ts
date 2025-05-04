@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Status } from "../types/types";
+import { Status } from "../../types/types";
 
 const API_BASE_URL = "http://localhost:5088/api";
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { Status } from "../types/types";
-import { fetchStatuses, deleteStatus } from "../api/statusApi";
+import { fetchStatuses, deleteStatus } from "../utils/api/statusApi";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const StatusesPage: React.FC = () => {

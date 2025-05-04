@@ -2,9 +2,9 @@ import { Button, Table, Container } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Category } from "../types/types";
-import { fetchCategories } from "../api/categoryApi";
+import { fetchCategories } from "../utils/api/categoryApi";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
-import { deleteCategory } from "../api/categoryApi";
+import { deleteCategory } from "../utils/api/categoryApi";
 
 const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -1,21 +1,21 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import EmployeesPage from "../pages/EmployeesPage";
-import EmployeeDetails from "../components/employee/EmployeeDetails";
+import EmployeeDetails from "../features/employee/EmployeeDetails";
 import AssignmentsPage from "../pages/AssignmentsPage";
 import StatusesPage from "../pages/StatusesPage";
 import CategoriesPage from "../pages/CategoriesPage";
-import CategoryDetails from "../components/category/CategoryDetails";
-import EditCategoryForm from "../components/category/EditCategoryForm";
-import StatusDetails from "../components/status/StatusDetails";
-import EditStatusForm from "../components/status/EditStatusForm";
-import EditEmployeeForm from "../components/employee/EditEmployeeForm";
-import AssignmentDetails from "../components/assignment/AssignmentDetails";
-import EditAssignmentForm from "../components/assignment/EditAssignmentForm";
-import AddCategoryForm from "../components/category/AddCategoryForm";
-import AddStatusForm from "../components/status/AddStatusForm";
-import AddEmployeeForm from "../components/employee/AddEmployeeForm";
-import AddAssignmentForm from "../components/assignment/AddAssignmentForm";
+import CategoryDetails from "../features/category/CategoryDetails";
+import EditCategoryForm from "../features/category/EditCategoryForm";
+import StatusDetails from "../features/status/StatusDetails";
+import EditStatusForm from "../features/status/EditStatusForm";
+import EditEmployeeForm from "../features/employee/EditEmployeeForm";
+import AssignmentDetails from "../features/assignment/AssignmentDetails";
+import EditAssignmentForm from "../features/assignment/EditAssignmentForm";
+import AddCategoryForm from "../features/category/AddCategoryForm";
+import AddStatusForm from "../features/status/AddStatusForm";
+import AddEmployeeForm from "../features/employee/AddEmployeeForm";
+import AddAssignmentForm from "../features/assignment/AddAssignmentForm";
 
 const AppRoutes: React.FC = () => {
   return (

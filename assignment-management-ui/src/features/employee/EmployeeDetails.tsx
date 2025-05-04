@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Container, Card, Button } from "react-bootstrap";
 import { Employee } from "../../types/types";
+import { fetchEmployeeById } from "../../utils/api/employeeApi";
 
 const EmployeeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,10 +12,8 @@ const EmployeeDetails: React.FC = () => {
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5088/api/Employee/${id}`
-        );
-        setEmployee(response.data);
+        const data = await fetchEmployeeById(id!);
+        setEmployee(data);
       } catch (error) {
         console.error("Error fetching employee details:", error);
       }

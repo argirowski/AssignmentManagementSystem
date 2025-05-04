@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Category } from "../types/types";
+import { Category } from "../../types/types";
 
 const API_BASE_URL = "http://localhost:5088/api";
 

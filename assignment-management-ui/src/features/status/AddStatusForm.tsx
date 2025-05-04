@@ -2,33 +2,19 @@ import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addEmployee } from "../../api/employeeApi";
-import ConfirmCancelModal from "../ConfirmCancelModal";
+import { addStatus } from "../../utils/api/statusApi";
+import ConfirmCancelModal from "../../components/ConfirmCancelModal";
+import { statusSchema, StatusFormData } from "../../utils/validation";
 
-const schema = z.object({
-  fullName: z
-    .string()
-    .min(1, "Full Name is required")
-    .max(50, "Full Name must be less than 50 characters"),
-  email: z
-    .string()
-    .email("Invalid email address")
-    .min(1, "Email is required")
-    .max(50, "Email must be less than 50 characters"),
-});
-
-type FormData = z.infer<typeof schema>;
-
-const AddEmployeeForm: React.FC = () => {
+const AddStatusForm: React.FC = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: { fullName: "", email: "" },
+  } = useForm<StatusFormData>({
+    resolver: zodResolver(statusSchema),
+    defaultValues: { description: "" },
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -51,12 +37,12 @@ const AddEmployeeForm: React.FC = () => {
     setShowModal(false);
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: StatusFormData) => {
     try {
-      await addEmployee({ ...data });
-      navigate("/employees");
+      await addStatus(data.description);
+      navigate("/statuses");
     } catch (error) {
-      console.error("Error adding employee:", error);
+      console.error("Error adding status:", error);
     }
   };
 
@@ -66,34 +52,20 @@ const AddEmployeeForm: React.FC = () => {
     >
       <Card className="mt-4">
         <Card.Body>
-          <h2 className="text-start">Add New Employee</h2>
+          <h2 className="text-start">Add New Status</h2>
           <Form onSubmit={handleSubmit(onSubmit)} className="mt-4 text-start">
-            <Form.Group className="mb-3" controlId="formEmployeeFullName">
+            <Form.Group className="mb-3" controlId="formStatusDescription">
               <Form.Label>
-                <strong>Full Name</strong>
+                <strong>Description</strong>
               </Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter employee full name"
-                {...register("fullName")}
-                isInvalid={!!errors.fullName}
+                placeholder="Enter status description"
+                {...register("description")}
+                isInvalid={!!errors.description}
               />
               <Form.Control.Feedback type="invalid">
-                {errors.fullName?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formEmployeeEmail">
-              <Form.Label>
-                <strong>Email</strong>
-              </Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter employee email"
-                {...register("email")}
-                isInvalid={!!errors.email}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.email?.message}
+                {errors.description?.message}
               </Form.Control.Feedback>
             </Form.Group>
           </Form>
@@ -107,15 +79,15 @@ const AddEmployeeForm: React.FC = () => {
           variant="primary"
           size="lg"
           type="submit"
-          style={{ maxWidth: "15rem" }}
+          style={{ maxWidth: "10rem" }}
           onClick={handleSubmit(onSubmit)}
         >
-          Add Employee
+          Add Status
         </Button>
         <Button
           variant="secondary"
           size="lg"
-          style={{ maxWidth: "15rem" }}
+          style={{ maxWidth: "10rem" }}
           onClick={handleCancel}
         >
           Cancel
@@ -130,4 +102,4 @@ const AddEmployeeForm: React.FC = () => {
   );
 };
 
-export default AddEmployeeForm;
+export default AddStatusForm;

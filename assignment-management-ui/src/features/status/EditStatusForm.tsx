@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import { fetchCategoryById, updateCategory } from "../../api/categoryApi";
-import { Category } from "../../types/types";
-import {
-  categorySchema,
-  CategoryFormData,
-} from "../../validation/categoryValidation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import ConfirmCancelModal from "../ConfirmCancelModal";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { fetchStatusById, updateStatus } from "../../utils/api/statusApi";
+import { Status } from "../../types/types";
+import ConfirmCancelModal from "../../components/ConfirmCancelModal";
+import { statusSchema, StatusFormData } from "../../utils/validation";
 
-const EditCategoryForm: React.FC = () => {
+const EditStatusForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [category, setCategory] = useState<Category | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
@@ -22,32 +19,34 @@ const EditCategoryForm: React.FC = () => {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-  } = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: { name: category?.name || "" },
+  } = useForm<StatusFormData>({
+    resolver: zodResolver(statusSchema),
+    defaultValues: { description: "" },
   });
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchStatus = async () => {
       try {
-        const data = await fetchCategoryById(id!);
-        setCategory(data);
-        reset({ name: data.name });
+        const data = await fetchStatusById(id!);
+        setStatus(data);
+        reset({ description: data.description });
       } catch (error) {
-        console.error("Error fetching category details:", error);
+        console.error("Error fetching status details:", error);
       }
     };
 
-    fetchCategory();
+    fetchStatus();
   }, [id, reset]);
 
-  const onSubmit = async (data: CategoryFormData) => {
-    console.log("Submitting data:", { id: category?.id, name: data.name }); // Log the data being sent
+  const onSubmit = async (data: StatusFormData) => {
     try {
-      await updateCategory(id!, { id: category?.id!, name: data.name });
-      navigate(`/categories`);
+      await updateStatus(id!, {
+        id: status?.id!,
+        description: data.description,
+      });
+      navigate(`/statuses`);
     } catch (error) {
-      console.error("Error updating category:", error);
+      console.error("Error updating status:", error);
     }
   };
 
@@ -68,7 +67,7 @@ const EditCategoryForm: React.FC = () => {
     setShowModal(false);
   };
 
-  if (!category) {
+  if (!status) {
     return <p>Loading...</p>;
   }
 
@@ -78,20 +77,20 @@ const EditCategoryForm: React.FC = () => {
     >
       <Card className="mt-4">
         <Card.Body>
-          <h2 className="text-start">Edit Category</h2>
+          <h2 className="text-start">Edit Status</h2>
           <Form onSubmit={handleSubmit(onSubmit)} className="mt-4 text-start">
-            <Form.Group className="mb-3" controlId="formCategoryName">
+            <Form.Group className="mb-3" controlId="formStatusDescription">
               <Form.Label>
-                <strong>Category Name</strong>
+                <strong>Description</strong>
               </Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter category name"
-                {...register("name")}
-                isInvalid={!!errors.name}
+                placeholder="Enter status description"
+                {...register("description")}
+                isInvalid={!!errors.description}
               />
               <Form.Control.Feedback type="invalid">
-                {errors.name?.message}
+                {errors.description?.message}
               </Form.Control.Feedback>
             </Form.Group>
             <Button
@@ -122,4 +121,4 @@ const EditCategoryForm: React.FC = () => {
   );
 };
 
-export default EditCategoryForm;
+export default EditStatusForm;

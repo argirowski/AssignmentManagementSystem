@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
-import axios from "axios";
 import { Status } from "../../types/types";
+import { fetchStatusById } from "../../utils/api/statusApi";
 
 const StatusDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,10 +12,8 @@ const StatusDetails: React.FC = () => {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5088/api/Status/${id}`
-        );
-        setStatus(response.data);
+        const data = await fetchStatusById(id!);
+        setStatus(data);
       } catch (error) {
         console.error("Error fetching status details:", error);
       }

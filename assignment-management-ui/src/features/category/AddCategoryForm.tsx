@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { addCategory } from "../../api/categoryApi";
+import { addCategory } from "../../utils/api/categoryApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  categorySchema,
-  CategoryFormData,
-} from "../../validation/categoryValidation";
-import ConfirmCancelModal from "../ConfirmCancelModal";
+import { categorySchema, CategoryFormData } from "../../utils/validation";
+import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 
 const AddCategoryForm: React.FC = () => {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchEmployees, deleteEmployee } from "../api/employeeApi";
+import { fetchEmployees, deleteEmployee } from "../utils/api/employeeApi";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { Employee } from "../types/types";
