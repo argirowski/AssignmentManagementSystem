@@ -11,6 +11,7 @@ const EmployeesPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +36,7 @@ const EmployeesPage: React.FC = () => {
 
   const confirmDelete = async () => {
     if (employeeToDelete !== null) {
+      setDeleting(true);
       try {
         await deleteEmployee(employeeToDelete);
         setEmployees((prevEmployees) =>
@@ -43,6 +45,7 @@ const EmployeesPage: React.FC = () => {
       } catch (error) {
         console.error("Error deleting employee:", error);
       } finally {
+        setDeleting(false);
         setShowModal(false);
         setEmployeeToDelete(null);
       }
@@ -54,7 +57,7 @@ const EmployeesPage: React.FC = () => {
     setEmployeeToDelete(null);
   };
 
-  if (loading) {
+  if (loading || deleting) {
     return <LoadingSpinner />;
   }
 

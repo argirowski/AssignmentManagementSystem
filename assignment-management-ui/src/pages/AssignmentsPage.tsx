@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Button, Table, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Assignment } from "../types/types";
