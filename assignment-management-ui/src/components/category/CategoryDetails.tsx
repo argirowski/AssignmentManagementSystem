@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
-import axios from "axios";
 import { Category } from "../../types/types";
+import { fetchCategoryById } from "../../api/categoryApi";
 
 const CategoryDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,18 +10,16 @@ const CategoryDetails: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const getCategory = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5088/api/Category/${id}`
-        );
-        setCategory(response.data);
+        const data = await fetchCategoryById(id!);
+        setCategory(data);
       } catch (error) {
         console.error("Error fetching category details:", error);
       }
     };
 
-    fetchCategory();
+    getCategory();
   }, [id]);
 
   if (!category) {

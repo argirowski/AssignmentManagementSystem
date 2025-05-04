@@ -1,16 +1,49 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { addCategory } from "../../api/categoryApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  categorySchema,
+  CategoryFormData,
+} from "../../validation/categoryValidation";
+import ConfirmCancelModal from "../ConfirmCancelModal";
 
 const AddCategoryForm: React.FC = () => {
-  const [name, setName] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+  } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: { name: "" },
+  });
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowModal(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmCancel = () => {
+    setShowModal(false);
+    navigate(-1);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const onSubmit = async (data: CategoryFormData) => {
     try {
-      await axios.post("http://localhost:5088/api/Category", { name });
+      await addCategory(data.name);
       navigate("/categories");
     } catch (error) {
       console.error("Error adding category:", error);
@@ -24,7 +57,7 @@ const AddCategoryForm: React.FC = () => {
       <Card className="mt-4">
         <Card.Body>
           <h2 className="text-start">Add New Category</h2>
-          <Form onSubmit={handleSubmit} className="mt-4 text-start">
+          <Form className="mt-4 text-start" onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="formCategoryName">
               <Form.Label>
                 <strong>Category Name</strong>
@@ -32,35 +65,42 @@ const AddCategoryForm: React.FC = () => {
               <Form.Control
                 type="text"
                 placeholder="Enter category name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...register("name")}
+                isInvalid={!!errors.name}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.name?.message}
+              </Form.Control.Feedback>
             </Form.Group>
+            <div
+              className="d-flex justify-content-start mt-2"
+              style={{ gap: "1rem" }}
+            >
+              <Button
+                variant="primary"
+                type="submit"
+                size="lg"
+                style={{ maxWidth: "10rem" }}
+              >
+                Add Category
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                style={{ maxWidth: "10rem" }}
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+            </div>
           </Form>
         </Card.Body>
       </Card>
-      <div
-        className="d-flex justify-content-start mt-2"
-        style={{ gap: "1rem" }}
-      >
-        <Button
-          variant="primary"
-          type="submit"
-          size="lg"
-          style={{ maxWidth: "10rem" }}
-          onClick={handleSubmit}
-        >
-          Add Category
-        </Button>
-        <Button
-          variant="secondary"
-          size="lg"
-          style={{ maxWidth: "10rem" }}
-          onClick={() => navigate(-1)}
-        >
-          Cancel
-        </Button>
-      </div>
+      <ConfirmCancelModal
+        show={showModal}
+        onConfirm={confirmCancel}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };

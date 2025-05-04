@@ -1,25 +1,55 @@
 import { Button, Table, Container } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Category } from "../types/types";
+import { fetchCategories } from "../api/categoryApi";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import { deleteCategory } from "../api/categoryApi";
 
 const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const getCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:5088/api/Category");
-        setCategories(response.data);
+        const data = await fetchCategories();
+        setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
-    fetchCategories();
+    getCategories();
   }, []);
+
+  const handleDelete = (id: number) => {
+    setCategoryToDelete(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (categoryToDelete !== null) {
+      try {
+        await deleteCategory(categoryToDelete);
+        setCategories((prevCategories) =>
+          prevCategories.filter((category) => category.id !== categoryToDelete)
+        );
+      } catch (error) {
+        console.error("Error deleting category:", error);
+      } finally {
+        setShowModal(false);
+        setCategoryToDelete(null);
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setCategoryToDelete(null);
+  };
 
   return (
     <Container>
@@ -49,7 +79,12 @@ const CategoriesPage: React.FC = () => {
                   >
                     Edit
                   </Button>
-                  <Button variant="danger me-2">Delete</Button>
+                  <Button
+                    variant="danger me-2"
+                    onClick={() => handleDelete(id)}
+                  >
+                    Delete
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -62,6 +97,11 @@ const CategoriesPage: React.FC = () => {
           </p>
         </div>
       </div>
+      <ConfirmDeleteModal
+        show={showModal}
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };
