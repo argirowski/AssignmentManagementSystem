@@ -4,6 +4,8 @@ export type Employee = {
   email: string;
 };
 
+export type NewEmployee = Omit<Employee, "id">;
+
 export type Status = {
   id: number;
   description: string;

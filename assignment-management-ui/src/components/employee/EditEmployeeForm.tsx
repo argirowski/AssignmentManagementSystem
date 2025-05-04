@@ -1,43 +1,82 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import axios from "axios";
 import { Employee } from "../../types/types";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { fetchEmployeeById, updateEmployee } from "../../api/employeeApi";
+import ConfirmCancelModal from "../ConfirmCancelModal";
+
+const schema = z.object({
+  fullName: z
+    .string()
+    .min(1, "Full Name is required")
+    .max(100, "Full Name must be less than 100 characters"),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .min(1, "Email is required")
+    .max(100, "Email must be less than 100 characters"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const EditEmployeeForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [employee, setEmployee] = useState<Employee | null>(null);
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { fullName: "", email: "" },
+  });
+
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5088/api/Employee/${id}`
-        );
-        setEmployee(response.data);
-        setFullName(response.data.fullName);
-        setEmail(response.data.email);
+        const data = await fetchEmployeeById(id!);
+        setEmployee(data);
+        reset({ fullName: data.fullName, email: data.email });
       } catch (error) {
         console.error("Error fetching employee details:", error);
       }
     };
 
     fetchEmployee();
-  }, [id]);
+  }, [id, reset]);
 
-  const handleSave = async () => {
+  const onSubmit = async (data: FormData) => {
     try {
-      await axios.put(`http://localhost:5088/api/Employee/${id}`, {
-        fullName,
-        email,
-      });
+      await updateEmployee(id!, { id: employee?.id!, ...data });
       navigate(`/employees`);
     } catch (error) {
       console.error("Error updating employee:", error);
     }
+  };
+
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowModal(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmCancel = () => {
+    setShowModal(false);
+    navigate(-1);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   if (!employee) {
@@ -51,7 +90,7 @@ const EditEmployeeForm: React.FC = () => {
       <Card className="mt-4">
         <Card.Body>
           <h2 className="text-start">Edit Employee</h2>
-          <Form className="mt-4 text-start">
+          <Form onSubmit={handleSubmit(onSubmit)} className="mt-4 text-start">
             <Form.Group className="mb-3" controlId="formEmployeeFullName">
               <Form.Label>
                 <strong>Full Name</strong>
@@ -59,9 +98,12 @@ const EditEmployeeForm: React.FC = () => {
               <Form.Control
                 type="text"
                 placeholder="Enter employee full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                {...register("fullName")}
+                isInvalid={!!errors.fullName}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.fullName?.message}
+              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formEmployeeEmail">
               <Form.Label>
@@ -70,34 +112,38 @@ const EditEmployeeForm: React.FC = () => {
               <Form.Control
                 type="email"
                 placeholder="Enter employee email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email")}
+                isInvalid={!!errors.email}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.email?.message}
+              </Form.Control.Feedback>
             </Form.Group>
+            <Button
+              variant="primary"
+              size="lg"
+              style={{ maxWidth: "10rem" }}
+              type="submit"
+            >
+              Save
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              style={{ maxWidth: "10rem", marginLeft: "1rem" }}
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
           </Form>
         </Card.Body>
       </Card>
-      <div
-        className="d-flex justify-content-start mt-2"
-        style={{ gap: "1rem" }}
-      >
-        <Button
-          variant="primary"
-          size="lg"
-          style={{ maxWidth: "10rem" }}
-          onClick={handleSave}
-        >
-          Save
-        </Button>
-        <Button
-          variant="secondary"
-          size="lg"
-          style={{ maxWidth: "10rem" }}
-          onClick={() => navigate(-1)}
-        >
-          Cancel
-        </Button>
-      </div>
+
+      <ConfirmCancelModal
+        show={showModal}
+        onConfirm={confirmCancel}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };

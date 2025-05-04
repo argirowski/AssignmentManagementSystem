@@ -1,25 +1,54 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { fetchEmployees, deleteEmployee } from "../api/employeeApi";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { Employee } from "../types/types";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const EmployeesPage: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const getEmployees = async () => {
       try {
-        const response = await axios.get("http://localhost:5088/api/Employee");
-        setEmployees(response.data);
+        const data = await fetchEmployees();
+        setEmployees(data);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
     };
 
-    fetchEmployees();
+    getEmployees();
   }, []);
+
+  const handleDelete = (id: number) => {
+    setEmployeeToDelete(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (employeeToDelete !== null) {
+      try {
+        await deleteEmployee(employeeToDelete);
+        setEmployees((prevEmployees) =>
+          prevEmployees.filter((employee) => employee.id !== employeeToDelete)
+        );
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+      } finally {
+        setShowModal(false);
+        setEmployeeToDelete(null);
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEmployeeToDelete(null);
+  };
 
   return (
     <Container>
@@ -51,7 +80,12 @@ const EmployeesPage: React.FC = () => {
                   >
                     Edit
                   </Button>
-                  <Button variant="danger me-2">Delete</Button>
+                  <Button
+                    variant="danger me-2"
+                    onClick={() => handleDelete(id)}
+                  >
+                    Delete
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -64,6 +98,11 @@ const EmployeesPage: React.FC = () => {
           </p>
         </div>
       </div>
+      <ConfirmDeleteModal
+        show={showModal}
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };

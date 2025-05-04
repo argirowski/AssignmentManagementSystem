@@ -1,16 +1,54 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addStatus } from "../../api/statusApi";
+import ConfirmCancelModal from "../ConfirmCancelModal";
+
+const schema = z.object({
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(100, "Description must be less than 100 characters"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const AddStatusForm: React.FC = () => {
-  const [description, setDescription] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { description: "" },
+  });
+
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowModal(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmCancel = () => {
+    setShowModal(false);
+    navigate(-1);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const onSubmit = async (data: FormData) => {
     try {
-      await axios.post("http://localhost:5088/api/Status", { description });
+      await addStatus(data.description);
       navigate("/statuses");
     } catch (error) {
       console.error("Error adding status:", error);
@@ -24,7 +62,7 @@ const AddStatusForm: React.FC = () => {
       <Card className="mt-4">
         <Card.Body>
           <h2 className="text-start">Add New Status</h2>
-          <Form onSubmit={handleSubmit} className="mt-4 text-start">
+          <Form onSubmit={handleSubmit(onSubmit)} className="mt-4 text-start">
             <Form.Group className="mb-3" controlId="formStatusDescription">
               <Form.Label>
                 <strong>Description</strong>
@@ -32,9 +70,12 @@ const AddStatusForm: React.FC = () => {
               <Form.Control
                 type="text"
                 placeholder="Enter status description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                {...register("description")}
+                isInvalid={!!errors.description}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.description?.message}
+              </Form.Control.Feedback>
             </Form.Group>
           </Form>
         </Card.Body>
@@ -48,7 +89,7 @@ const AddStatusForm: React.FC = () => {
           size="lg"
           type="submit"
           style={{ maxWidth: "10rem" }}
-          onClick={handleSubmit}
+          onClick={handleSubmit(onSubmit)}
         >
           Add Status
         </Button>
@@ -56,11 +97,16 @@ const AddStatusForm: React.FC = () => {
           variant="secondary"
           size="lg"
           style={{ maxWidth: "10rem" }}
-          onClick={() => navigate(-1)}
+          onClick={handleCancel}
         >
           Cancel
         </Button>
       </div>
+      <ConfirmCancelModal
+        show={showModal}
+        onConfirm={confirmCancel}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };

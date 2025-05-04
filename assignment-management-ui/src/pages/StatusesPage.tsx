@@ -1,25 +1,54 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { Status } from "../types/types";
+import { fetchStatuses, deleteStatus } from "../api/statusApi";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const StatusesPage: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchStatuses = async () => {
+    const getStatuses = async () => {
       try {
-        const response = await axios.get("http://localhost:5088/api/Status");
-        setStatuses(response.data);
+        const data = await fetchStatuses();
+        setStatuses(data);
       } catch (error) {
         console.error("Error fetching statuses:", error);
       }
     };
 
-    fetchStatuses();
+    getStatuses();
   }, []);
+
+  const handleDelete = (id: number) => {
+    setStatusToDelete(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (statusToDelete !== null) {
+      try {
+        await deleteStatus(statusToDelete);
+        setStatuses((prevStatuses) =>
+          prevStatuses.filter((status) => status.id !== statusToDelete)
+        );
+      } catch (error) {
+        console.error("Error deleting status:", error);
+      } finally {
+        setShowModal(false);
+        setStatusToDelete(null);
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setStatusToDelete(null);
+  };
 
   return (
     <Container>
@@ -49,7 +78,12 @@ const StatusesPage: React.FC = () => {
                   >
                     Edit
                   </Button>
-                  <Button variant="danger me-2">Delete</Button>
+                  <Button
+                    variant="danger me-2"
+                    onClick={() => handleDelete(id)}
+                  >
+                    Delete
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -61,6 +95,11 @@ const StatusesPage: React.FC = () => {
           </p>
         </div>
       </div>
+      <ConfirmDeleteModal
+        show={showModal}
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };
