@@ -7,6 +7,7 @@ import { categorySchema, CategoryFormData } from "../../utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EditCategoryForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,7 +67,7 @@ const EditCategoryForm: React.FC = () => {
   };
 
   if (!category) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

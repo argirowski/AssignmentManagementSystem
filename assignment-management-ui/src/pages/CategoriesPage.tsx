@@ -5,12 +5,14 @@ import { Category } from "../types/types";
 import { fetchCategories } from "../utils/api/categoryApi";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { deleteCategory } from "../utils/api/categoryApi";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getCategories = async () => {
@@ -19,6 +21,8 @@ const CategoriesPage: React.FC = () => {
         setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -50,6 +54,10 @@ const CategoriesPage: React.FC = () => {
     setShowModal(false);
     setCategoryToDelete(null);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Container>

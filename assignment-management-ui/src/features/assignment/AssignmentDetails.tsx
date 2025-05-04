@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
 import axios from "axios";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 type Employee = {
   id: number;
@@ -51,7 +52,7 @@ const AssignmentDetails: React.FC = () => {
   }, [id]);
 
   if (!assignment) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

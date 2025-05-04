@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
 import { Status } from "../../types/types";
 import { fetchStatusById } from "../../utils/api/statusApi";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const StatusDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ const StatusDetails: React.FC = () => {
   }, [id]);
 
   if (!status) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

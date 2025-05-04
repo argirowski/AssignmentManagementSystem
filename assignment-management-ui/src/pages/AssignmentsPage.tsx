@@ -3,25 +3,32 @@ import axios from "axios";
 import { Button, Table, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Assignment } from "../types/types";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { fetchAssignments } from "../utils/api/assignmentApi";
 
 const AssignmentsPage: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAssignments = async () => {
+    const getAssignments = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5088/api/Assignment"
-        );
-        setAssignments(response.data);
+        const data = await fetchAssignments();
+        setAssignments(data);
       } catch (error) {
         console.error("Error fetching assignments:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAssignments();
+    getAssignments();
   }, []);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Container>

@@ -1,0 +1,14 @@
+import axios from "axios";
+import { Assignment } from "../../types/types";
+
+const API_BASE_URL = "http://localhost:5088/api";
+
+export const fetchAssignments = async (): Promise<Assignment[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Assignment`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching assignments:", error);
+    throw error;
+  }
+};

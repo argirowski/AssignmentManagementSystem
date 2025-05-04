@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
 import axios from "axios";
 import { Assignment, Category, Employee, Status } from "../../types/types";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EditAssignmentForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -74,7 +75,7 @@ const EditAssignmentForm: React.FC = () => {
   };
 
   if (!assignment) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

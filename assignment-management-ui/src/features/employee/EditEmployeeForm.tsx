@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { fetchEmployeeById, updateEmployee } from "../../utils/api/employeeApi";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { employeeSchema, EmployeeFormData } from "../../utils/validation";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EditEmployeeForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,7 +67,7 @@ const EditEmployeeForm: React.FC = () => {
   };
 
   if (!employee) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

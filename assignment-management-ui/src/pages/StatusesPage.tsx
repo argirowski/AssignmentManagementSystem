@@ -4,12 +4,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { Status } from "../types/types";
 import { fetchStatuses, deleteStatus } from "../utils/api/statusApi";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const StatusesPage: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getStatuses = async () => {
@@ -18,6 +20,8 @@ const StatusesPage: React.FC = () => {
         setStatuses(data);
       } catch (error) {
         console.error("Error fetching statuses:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -49,6 +53,10 @@ const StatusesPage: React.FC = () => {
     setShowModal(false);
     setStatusToDelete(null);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Container>

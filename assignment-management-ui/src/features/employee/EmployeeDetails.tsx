@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Container, Card, Button } from "react-bootstrap";
 import { Employee } from "../../types/types";
 import { fetchEmployeeById } from "../../utils/api/employeeApi";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EmployeeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ const EmployeeDetails: React.FC = () => {
   }, [id]);
 
   if (!employee) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

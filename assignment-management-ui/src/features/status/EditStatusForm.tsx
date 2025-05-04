@@ -7,6 +7,7 @@ import { fetchStatusById, updateStatus } from "../../utils/api/statusApi";
 import { Status } from "../../types/types";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { statusSchema, StatusFormData } from "../../utils/validation";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EditStatusForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,7 +69,7 @@ const EditStatusForm: React.FC = () => {
   };
 
   if (!status) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

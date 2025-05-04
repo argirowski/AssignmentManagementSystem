@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
 import { Category } from "../../types/types";
 import { fetchCategoryById } from "../../utils/api/categoryApi";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const CategoryDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ const CategoryDetails: React.FC = () => {
   }, [id]);
 
   if (!category) {
-    return <p>Loading...</p>;
+    return <LoadingSpinner />;
   }
 
   return (

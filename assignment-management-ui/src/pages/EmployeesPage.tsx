@@ -4,11 +4,13 @@ import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { Employee } from "../types/types";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const EmployeesPage: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +20,8 @@ const EmployeesPage: React.FC = () => {
         setEmployees(data);
       } catch (error) {
         console.error("Error fetching employees:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -49,6 +53,10 @@ const EmployeesPage: React.FC = () => {
     setShowModal(false);
     setEmployeeToDelete(null);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Container>
