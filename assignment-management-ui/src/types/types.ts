@@ -6,6 +6,8 @@ export type Employee = {
 
 export type NewEmployee = Omit<Employee, "id">;
 
+export type EmployeeSelect = Omit<Employee, "email">;
+
 export type Status = {
   id: number;
   description: string;

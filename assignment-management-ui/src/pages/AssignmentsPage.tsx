@@ -41,11 +41,8 @@ const AssignmentsPage: React.FC = () => {
       setDeleting(true);
       try {
         await deleteAssignment(assignmentToDelete);
-        setAssignments((prevAssignments) =>
-          prevAssignments.filter(
-            (assignment) => assignment.id !== Number(assignmentToDelete)
-          )
-        );
+        const updatedAssignments = await fetchAssignments(); // Fetch updated assignments
+        setAssignments(updatedAssignments); // Update the state with the new data
       } catch (error) {
         console.error("Error deleting assignment:", error);
       } finally {

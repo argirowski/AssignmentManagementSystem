@@ -6,20 +6,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { fetchCategories } from "../../utils/api/categoryApi";
 import { fetchEmployees } from "../../utils/api/employeeApi";
 import { fetchStatuses } from "../../utils/api/statusApi";
-import { Category, Status, CreateAssignment } from "../../types/types";
+import {
+  Category,
+  Status,
+  CreateAssignment,
+  EmployeeSelect,
+} from "../../types/types";
 import { addAssignment } from "../../utils/api/assignmentApi";
 import Select from "react-select";
 import { assignmentSchema } from "../../utils/validation";
 
-interface Employee {
-  id: string;
-  fullName: string;
-}
-
 const AddAssignmentForm: React.FC = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<EmployeeSelect[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
 
   const {
