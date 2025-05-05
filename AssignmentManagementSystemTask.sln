@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{2335F2A8-CD06-40D7-B2F7-7DDEF738DB4A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{35312224-268C-45EB-B2BF-88D57D9CF6FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssignmentManagementSystemUnitTests", "AssignmentManagementSystemUnitTests\AssignmentManagementSystemUnitTests.csproj", "{2B27F8D0-5375-4E63-B317-4C4B6F2C3881}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,8 +37,15 @@ Global
 		{2335F2A8-CD06-40D7-B2F7-7DDEF738DB4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2335F2A8-CD06-40D7-B2F7-7DDEF738DB4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2335F2A8-CD06-40D7-B2F7-7DDEF738DB4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B27F8D0-5375-4E63-B317-4C4B6F2C3881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B27F8D0-5375-4E63-B317-4C4B6F2C3881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B27F8D0-5375-4E63-B317-4C4B6F2C3881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B27F8D0-5375-4E63-B317-4C4B6F2C3881}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2B27F8D0-5375-4E63-B317-4C4B6F2C3881} = {35312224-268C-45EB-B2BF-88D57D9CF6FD}
 	EndGlobalSection
 EndGlobal
