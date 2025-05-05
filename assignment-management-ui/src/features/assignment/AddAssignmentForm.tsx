@@ -91,6 +91,11 @@ const AddAssignmentForm: React.FC = () => {
     label: category.name,
   }));
 
+  const onCategoryChange = (selectedOptions: any) => {
+    const values = selectedOptions.map((option: any) => option.value);
+    setValue("categoryIds", values, { shouldValidate: true });
+  };
+
   return (
     <Container
       style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
@@ -139,18 +144,14 @@ const AddAssignmentForm: React.FC = () => {
               <Select
                 isMulti
                 options={categoryOptions}
-                {...register("categoryIds")}
-                onChange={(selectedOptions) => {
-                  const values = selectedOptions.map((option) =>
-                    option.value.toString()
-                  );
-                  setValue("categoryIds", values);
-                }}
+                onChange={onCategoryChange}
                 placeholder="Select categories..."
               />
-              <Form.Control.Feedback type="invalid">
-                {errors.categoryIds?.message}
-              </Form.Control.Feedback>
+              {errors.categoryIds && (
+                <div className="invalid-feedback d-block">
+                  {errors.categoryIds.message}
+                </div>
+              )}
             </Form.Group>
 
             <Form.Group controlId="formEmployee" className="mb-3">
