@@ -31,3 +31,14 @@ export const employeeSchema = z.object({
 });
 
 export type EmployeeFormData = z.infer<typeof employeeSchema>;
+
+export const assignmentSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  isCompleted: z.boolean(),
+  employeeId: z.string().min(1, "Employee is required"),
+  statusId: z.string().min(1, "Status is required"),
+  categoryIds: z.array(z.string()).min(1, "At least one category is required"),
+});
+
+export type AssignmentFormData = z.infer<typeof assignmentSchema>;

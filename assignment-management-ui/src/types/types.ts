@@ -25,3 +25,12 @@ export type Assignment = {
   status: Status;
   categories: Category[];
 };
+
+export type CreateAssignment = {
+  title: string;
+  description: string;
+  isCompleted: boolean;
+  employeeId: string;
+  statusId: string;
+  categoryIds: string[];
+};
