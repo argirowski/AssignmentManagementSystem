@@ -1,3 +1,4 @@
+using Application.DTOs;
 using FluentValidation;
 
 public class CreateAssignmentDTOValidator : AbstractValidator<CreateAssignmentDTO>
