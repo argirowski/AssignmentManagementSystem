@@ -12,3 +12,12 @@ export const fetchAssignments = async (): Promise<Assignment[]> => {
     throw error;
   }
 };
+
+export const deleteAssignment = async (id: string): Promise<void> => {
+  try {
+    await axios.delete(`${API_BASE_URL}/Assignment/${id}`);
+  } catch (error) {
+    console.error("Error deleting assignment:", error);
+    throw error;
+  }
+};

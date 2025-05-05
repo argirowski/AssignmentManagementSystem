@@ -3,11 +3,17 @@ import { Button, Table, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Assignment } from "../types/types";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchAssignments } from "../utils/api/assignmentApi";
+import { fetchAssignments, deleteAssignment } from "../utils/api/assignmentApi";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const AssignmentsPage: React.FC = () => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(
+    null
+  );
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +31,37 @@ const AssignmentsPage: React.FC = () => {
     getAssignments();
   }, []);
 
-  if (loading) {
+  const handleDelete = (id: string) => {
+    setAssignmentToDelete(id);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (assignmentToDelete !== null) {
+      setDeleting(true);
+      try {
+        await deleteAssignment(assignmentToDelete);
+        setAssignments((prevAssignments) =>
+          prevAssignments.filter(
+            (assignment) => assignment.id !== Number(assignmentToDelete)
+          )
+        );
+      } catch (error) {
+        console.error("Error deleting assignment:", error);
+      } finally {
+        setDeleting(false);
+        setShowModal(false);
+        setAssignmentToDelete(null);
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setAssignmentToDelete(null);
+  };
+
+  if (loading || deleting) {
     return <LoadingSpinner />;
   }
 
@@ -79,7 +115,12 @@ const AssignmentsPage: React.FC = () => {
                     >
                       Edit
                     </Button>
-                    <Button variant="danger me-2">Delete</Button>
+                    <Button
+                      variant="danger me-2"
+                      onClick={() => handleDelete(id.toString())}
+                    >
+                      Delete
+                    </Button>
                   </td>
                 </tr>
               )
@@ -93,6 +134,11 @@ const AssignmentsPage: React.FC = () => {
           </p>
         </div>
       </div>
+      <ConfirmDeleteModal
+        show={showModal}
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };
