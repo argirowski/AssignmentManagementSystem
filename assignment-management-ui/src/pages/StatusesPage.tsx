@@ -1,33 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
-import { Status } from "../types/types";
-import { fetchStatuses, deleteStatus } from "../utils/api/statusApi";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStatuses } from "../features/status/statusActions";
+import { AppState, AppDispatch } from "../store";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { Status } from "../types/types";
 
 const StatusesPage: React.FC = () => {
-  const [statuses, setStatuses] = useState<Status[]>([]);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const { statuses, loading, error } = useSelector(
+    (state: AppState) => state.statuses
+  );
+
+  // Add type annotation for statuses
+  const typedStatuses: Status[] = statuses;
+
   const [showModal, setShowModal] = useState(false);
   const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const getStatuses = async () => {
-      try {
-        const data = await fetchStatuses();
-        setStatuses(data);
-      } catch (error) {
-        console.error("Error fetching statuses:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getStatuses();
-  }, []);
+    dispatch(fetchStatuses());
+  }, [dispatch]);
 
   const handleDelete = (id: number) => {
     setStatusToDelete(id);
@@ -36,19 +32,9 @@ const StatusesPage: React.FC = () => {
 
   const confirmDelete = async () => {
     if (statusToDelete !== null) {
-      setDeleting(true);
-      try {
-        await deleteStatus(statusToDelete);
-        setStatuses((prevStatuses) =>
-          prevStatuses.filter((status) => status.id !== statusToDelete)
-        );
-      } catch (error) {
-        console.error("Error deleting status:", error);
-      } finally {
-        setDeleting(false);
-        setShowModal(false);
-        setStatusToDelete(null);
-      }
+      // Dispatch delete action here when implemented
+      setShowModal(false);
+      setStatusToDelete(null);
     }
   };
 
@@ -57,8 +43,12 @@ const StatusesPage: React.FC = () => {
     setStatusToDelete(null);
   };
 
-  if (loading || deleting) {
+  if (loading) {
     return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
   }
 
   return (
@@ -73,7 +63,7 @@ const StatusesPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {statuses.map(({ id, description }) => (
+            {typedStatuses.map(({ id, description }) => (
               <tr key={id}>
                 <td>{description}</td>
                 <td>
