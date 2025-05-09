@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { fetchCategories } from "../../utils/api/categoryApi";
 import { fetchEmployees } from "../../utils/api/employeeApi";
-import { fetchStatuses } from "../../utils/api/statusApi";
+import { apiFetchStatuses } from "../../utils/api/statusApi";
 import {
   Category,
   Status,
@@ -54,7 +54,7 @@ const AddAssignmentForm: React.FC = () => {
           fullName: employee.fullName,
         }));
 
-        const statusesData = (await fetchStatuses()).map((status: any) => ({
+        const statusesData = (await apiFetchStatuses()).map((status: any) => ({
           id: status.id.toString(),
           description: status.description,
         }));

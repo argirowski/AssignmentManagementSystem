@@ -6,8 +6,8 @@ import {
 } from "redux";
 import { thunk, ThunkMiddleware } from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
-import statusesReducer from "./features/status/statusesReducer";
 import { Status } from "./types/types";
+import statusesReducer from "./redux/status/statusesReducer";
 
 export type StatusesState = {
   statuses: Status[];

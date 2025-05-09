@@ -13,6 +13,10 @@ export type Status = {
   description: string;
 };
 
+export type StatusFormData = {
+  description: string;
+};
+
 export type Category = {
   id: number;
   name: string;

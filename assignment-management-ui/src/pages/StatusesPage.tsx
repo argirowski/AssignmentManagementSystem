@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStatuses } from "../features/status/statusActions";
+
 import { AppState, AppDispatch } from "../store";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { Status } from "../types/types";
-
+import {
+  fetchStatusesAction,
+  deleteStatusAction,
+} from "../redux/status/statusActions";
 const StatusesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,9 +23,10 @@ const StatusesPage: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchStatuses());
+    dispatch(fetchStatusesAction());
   }, [dispatch]);
 
   const handleDelete = (id: number) => {
@@ -32,9 +36,16 @@ const StatusesPage: React.FC = () => {
 
   const confirmDelete = async () => {
     if (statusToDelete !== null) {
-      // Dispatch delete action here when implemented
-      setShowModal(false);
-      setStatusToDelete(null);
+      setDeleting(true);
+      try {
+        await dispatch(deleteStatusAction(statusToDelete));
+      } catch (error) {
+        console.error("Error deleting status:", error);
+      } finally {
+        setDeleting(false);
+        setShowModal(false);
+        setStatusToDelete(null);
+      }
     }
   };
 

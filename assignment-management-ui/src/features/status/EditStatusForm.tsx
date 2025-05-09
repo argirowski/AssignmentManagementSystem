@@ -3,16 +3,25 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fetchStatusById, updateStatus } from "../../utils/api/statusApi";
-import { Status } from "../../types/types";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, AppState } from "../../store";
+import { StatusFormData } from "../../types/types";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
-import { statusSchema, StatusFormData } from "../../utils/validation";
+import { statusSchema } from "../../utils/validation";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import {
+  fetchStatusByIdAction,
+  updateStatusAction,
+} from "../../redux/status/statusActions";
 
 const EditStatusForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [status, setStatus] = useState<Status | null>(null);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const { statuses, loading, error } = useSelector(
+    (state: AppState) => state.statuses
+  );
+  const status = statuses.length > 0 ? statuses[0] : null;
   const [showModal, setShowModal] = useState(false);
 
   const {
@@ -26,25 +35,25 @@ const EditStatusForm: React.FC = () => {
   });
 
   useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const data = await fetchStatusById(id!);
-        setStatus(data);
-        reset({ description: data.description });
-      } catch (error) {
-        console.error("Error fetching status details:", error);
-      }
-    };
+    if (id) {
+      dispatch(fetchStatusByIdAction(id));
+    }
+  }, [dispatch, id]);
 
-    fetchStatus();
-  }, [id, reset]);
+  useEffect(() => {
+    if (status) {
+      reset({ description: status.description });
+    }
+  }, [status, reset]);
 
   const onSubmit = async (data: StatusFormData) => {
     try {
-      await updateStatus(id!, {
-        id: status?.id!,
-        description: data.description,
-      });
+      await dispatch(
+        updateStatusAction(id!, {
+          id: status?.id!,
+          description: data.description,
+        })
+      );
       navigate(`/statuses`);
     } catch (error) {
       console.error("Error updating status:", error);
@@ -67,6 +76,14 @@ const EditStatusForm: React.FC = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!status) {
     return <LoadingSpinner />;

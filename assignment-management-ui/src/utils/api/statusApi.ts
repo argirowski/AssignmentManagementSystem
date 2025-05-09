@@ -3,7 +3,7 @@ import { Status } from "../../types/types";
 
 const API_BASE_URL = "http://localhost:5088/api";
 
-export const fetchStatuses = async (): Promise<Status[]> => {
+export const apiFetchStatuses = async (): Promise<Status[]> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Status`);
     return response.data;
@@ -13,7 +13,7 @@ export const fetchStatuses = async (): Promise<Status[]> => {
   }
 };
 
-export const deleteStatus = async (id: number): Promise<void> => {
+export const apiDeleteStatus = async (id: number): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Status/${id}`);
   } catch (error) {
@@ -22,7 +22,7 @@ export const deleteStatus = async (id: number): Promise<void> => {
   }
 };
 
-export const addStatus = async (description: string): Promise<void> => {
+export const apiAddStatus = async (description: string): Promise<void> => {
   try {
     await axios.post(`${API_BASE_URL}/Status`, { description });
   } catch (error) {
@@ -31,7 +31,7 @@ export const addStatus = async (description: string): Promise<void> => {
   }
 };
 
-export const fetchStatusById = async (id: string): Promise<Status> => {
+export const apiFetchStatusById = async (id: string): Promise<Status> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Status/${id}`);
     return response.data;
@@ -41,7 +41,7 @@ export const fetchStatusById = async (id: string): Promise<Status> => {
   }
 };
 
-export const updateStatus = async (
+export const apiUpdateStatus = async (
   id: string,
   status: Status
 ): Promise<void> => {

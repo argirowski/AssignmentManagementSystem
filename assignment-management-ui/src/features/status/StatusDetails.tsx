@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
-import { Status } from "../../types/types";
-import { fetchStatusById } from "../../utils/api/statusApi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppState, AppDispatch } from "../../store";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { fetchStatusByIdAction } from "../../redux/status/statusActions";
 
 const StatusDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [status, setStatus] = useState<Status | null>(null);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const data = await fetchStatusById(id!);
-        setStatus(data);
-      } catch (error) {
-        console.error("Error fetching status details:", error);
-      }
-    };
+  const { statuses, loading, error } = useSelector(
+    (state: AppState) => state.statuses
+  );
+  const status = statuses.length > 0 ? statuses[0] : null;
 
-    fetchStatus();
-  }, [id]);
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchStatusByIdAction(id));
+    }
+  }, [dispatch, id]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!status) {
-    return <LoadingSpinner />;
+    return <p>Status not found.</p>;
   }
 
   return (

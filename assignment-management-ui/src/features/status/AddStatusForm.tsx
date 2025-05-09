@@ -3,9 +3,11 @@ import { Container, Form, Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addStatus } from "../../utils/api/statusApi";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { statusSchema, StatusFormData } from "../../utils/validation";
+import { addStatusAction } from "../../redux/status/statusActions";
 
 const AddStatusForm: React.FC = () => {
   const {
@@ -19,6 +21,7 @@ const AddStatusForm: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
 
   const handleCancel = () => {
     if (isDirty) {
@@ -39,7 +42,7 @@ const AddStatusForm: React.FC = () => {
 
   const onSubmit = async (data: StatusFormData) => {
     try {
-      await addStatus(data.description);
+      await dispatch(addStatusAction(data.description));
       navigate("/statuses");
     } catch (error) {
       console.error("Error adding status:", error);
