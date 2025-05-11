@@ -3,7 +3,7 @@ import { Category } from "../../types/types";
 
 const API_BASE_URL = "http://localhost:5088/api";
 
-export const fetchCategories = async (): Promise<Category[]> => {
+export const apiFetchCategories = async (): Promise<Category[]> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Category`);
     return response.data;
@@ -35,7 +35,7 @@ export const updateCategory = async (
   }
 };
 
-export const addCategory = async (name: string): Promise<void> => {
+export const apiAddCategory = async (name: string): Promise<void> => {
   try {
     await axios.post(`${API_BASE_URL}/Category`, { name });
   } catch (error) {
@@ -44,7 +44,7 @@ export const addCategory = async (name: string): Promise<void> => {
   }
 };
 
-export const deleteCategory = async (id: number): Promise<void> => {
+export const apiDeleteCategory = async (id: number): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Category/${id}`);
   } catch (error) {

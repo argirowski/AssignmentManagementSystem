@@ -3,7 +3,7 @@ import { Form, Button, Container, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fetchCategories } from "../../utils/api/categoryApi";
+import { apiFetchCategories } from "../../utils/api/categoryApi";
 import { fetchEmployees } from "../../utils/api/employeeApi";
 import { apiFetchStatuses } from "../../utils/api/statusApi";
 import {
@@ -42,7 +42,7 @@ const AddAssignmentForm: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoriesData = (await fetchCategories()).map(
+        const categoriesData = (await apiFetchCategories()).map(
           (category: any) => ({
             id: category.id.toString(),
             name: category.name,

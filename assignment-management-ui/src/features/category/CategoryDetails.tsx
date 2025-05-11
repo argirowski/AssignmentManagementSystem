@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
-import { Category } from "../../types/types";
-import { fetchCategoryById } from "../../utils/api/categoryApi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppState, AppDispatch } from "../../store";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { fetchCategoryByIdAction } from "../../redux/category/categoryActions";
 
 const CategoryDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [category, setCategory] = useState<Category | null>(null);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const getCategory = async () => {
-      try {
-        const data = await fetchCategoryById(id!);
-        setCategory(data);
-      } catch (error) {
-        console.error("Error fetching category details:", error);
-      }
-    };
+  const { categories, loading, error } = useSelector(
+    (state: AppState) => state.categories
+  );
+  const category = categories.length > 0 ? categories[0] : null;
 
-    getCategory();
-  }, [id]);
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchCategoryByIdAction(id));
+    }
+  }, [dispatch, id]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!category) {
-    return <LoadingSpinner />;
+    return <p>Status not found.</p>;
   }
 
   return (

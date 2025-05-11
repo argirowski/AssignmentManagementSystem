@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { addCategory } from "../../utils/api/categoryApi";
+import { addCategoryAction } from "../../redux/category/categoryActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
 import { categorySchema, CategoryFormData } from "../../utils/validation";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 
 const AddCategoryForm: React.FC = () => {
-  const navigate = useNavigate();
-
   const {
     register,
     handleSubmit,
@@ -20,6 +20,8 @@ const AddCategoryForm: React.FC = () => {
   });
 
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
 
   const handleCancel = () => {
     if (isDirty) {
@@ -40,7 +42,7 @@ const AddCategoryForm: React.FC = () => {
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      await addCategory(data.name);
+      await dispatch(addCategoryAction(data.name));
       navigate("/categories");
     } catch (error) {
       console.error("Error adding category:", error);

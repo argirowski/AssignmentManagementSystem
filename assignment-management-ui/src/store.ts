@@ -8,6 +8,7 @@ import { thunk, ThunkMiddleware } from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { Status } from "./types/types";
 import statusesReducer from "./redux/status/statusesReducer";
+import categoriesReducer from "./redux/category/categoriesReducer";
 
 export type StatusesState = {
   statuses: Status[];
@@ -18,6 +19,7 @@ export type StatusesState = {
 // Placeholder reducers (replace with actual reducers later)
 const rootReducer = combineReducers({
   statuses: statusesReducer,
+  categories: categoriesReducer, // Added categories reducer
   // Add reducers here, e.g., assignment: assignmentReducer
 });
 

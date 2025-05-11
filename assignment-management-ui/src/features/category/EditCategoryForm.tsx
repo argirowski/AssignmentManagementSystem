@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import { fetchCategoryById, updateCategory } from "../../utils/api/categoryApi";
-import { Category } from "../../types/types";
+import {
+  fetchCategoryByIdAction,
+  updateCategoryAction,
+} from "../../redux/category/categoryActions";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, AppState } from "../../store";
 import { categorySchema, CategoryFormData } from "../../utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,8 +15,12 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EditCategoryForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [category, setCategory] = useState<Category | null>(null);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const { categories, loading, error } = useSelector(
+    (state: AppState) => state.categories
+  );
+  const category = categories.length > 0 ? categories[0] : null;
   const [showModal, setShowModal] = useState(false);
 
   const {
@@ -26,23 +34,26 @@ const EditCategoryForm: React.FC = () => {
   });
 
   useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const data = await fetchCategoryById(id!);
-        setCategory(data);
-        reset({ name: data.name });
-      } catch (error) {
-        console.error("Error fetching category details:", error);
-      }
-    };
+    if (id) {
+      dispatch(fetchCategoryByIdAction(id));
+    }
+  }, [dispatch, id]);
 
-    fetchCategory();
-  }, [id, reset]);
+  useEffect(() => {
+    if (category) {
+      reset({ name: category.name });
+    }
+  }, [category, reset]);
 
   const onSubmit = async (data: CategoryFormData) => {
     console.log("Submitting data:", { id: category?.id, name: data.name });
     try {
-      await updateCategory(id!, { id: category?.id!, name: data.name });
+      await dispatch(
+        updateCategoryAction(id!, {
+          id: category?.id!,
+          name: data.name,
+        })
+      );
       navigate(`/categories`);
     } catch (error) {
       console.error("Error updating category:", error);
@@ -65,6 +76,14 @@ const EditCategoryForm: React.FC = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!category) {
     return <LoadingSpinner />;

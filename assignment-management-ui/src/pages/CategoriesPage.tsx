@@ -2,33 +2,32 @@ import { Button, Table, Container } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Category } from "../types/types";
-import { fetchCategories } from "../utils/api/categoryApi";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchCategoriesAction,
+  deleteCategoryAction,
+} from "../redux/category/categoryActions";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
-import { deleteCategory } from "../utils/api/categoryApi";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { AppState, AppDispatch } from "../store";
 
 const CategoriesPage: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { categories, loading, error } = useSelector(
+    (state: AppState) => state.categories
+  );
+
+  // Add type annotation for statuses
+  const typedCategories: Category[] = categories;
+
   const [showModal, setShowModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const getCategories = async () => {
-      try {
-        const data = await fetchCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getCategories();
-  }, []);
+    dispatch(fetchCategoriesAction());
+  }, [dispatch]);
 
   const handleDelete = (id: number) => {
     setCategoryToDelete(id);
@@ -39,10 +38,7 @@ const CategoriesPage: React.FC = () => {
     if (categoryToDelete !== null) {
       setDeleting(true);
       try {
-        await deleteCategory(categoryToDelete);
-        setCategories((prevCategories) =>
-          prevCategories.filter((category) => category.id !== categoryToDelete)
-        );
+        await dispatch(deleteCategoryAction(categoryToDelete));
       } catch (error) {
         console.error("Error deleting category:", error);
       } finally {
@@ -62,6 +58,10 @@ const CategoriesPage: React.FC = () => {
     return <LoadingSpinner />;
   }
 
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
   return (
     <Container>
       <div className="categories">
@@ -74,7 +74,7 @@ const CategoriesPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {categories.map(({ id, name }) => (
+            {typedCategories.map(({ id, name }) => (
               <tr key={id}>
                 <td>{name}</td>
                 <td>
