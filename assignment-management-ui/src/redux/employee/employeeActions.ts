@@ -20,11 +20,11 @@ import {
   UPDATE_EMPLOYEE_FAILURE,
 } from "./employeeActionTypes";
 import {
-  fetchEmployees,
-  addEmployee,
-  deleteEmployee,
-  fetchEmployeeById,
-  updateEmployee,
+  apiAddEmployee,
+  apiDeleteEmployee,
+  apiFetchEmployees,
+  apiFetchEmployeeById,
+  apiUpdateEmployee,
 } from "../../utils/api/employeeApi";
 import { Employee, NewEmployee } from "../../types/types";
 
@@ -37,7 +37,7 @@ export const fetchEmployeesAction = (): ThunkAction<
   return async (dispatch: Dispatch) => {
     dispatch({ type: FETCH_EMPLOYEES_REQUEST });
     try {
-      const employees = await fetchEmployees();
+      const employees = await apiFetchEmployees();
       dispatch({ type: FETCH_EMPLOYEES_SUCCESS, payload: employees });
     } catch (error: any) {
       dispatch({ type: FETCH_EMPLOYEES_FAILURE, payload: error.message });
@@ -51,7 +51,7 @@ export const addEmployeeAction = (
   return async (dispatch: Dispatch) => {
     dispatch({ type: ADD_EMPLOYEE_REQUEST });
     try {
-      await addEmployee(employee);
+      await apiAddEmployee(employee);
       dispatch({ type: ADD_EMPLOYEE_SUCCESS });
     } catch (error: any) {
       dispatch({ type: ADD_EMPLOYEE_FAILURE, payload: error.message });
@@ -65,7 +65,7 @@ export const deleteEmployeeAction = (
   return async (dispatch: Dispatch) => {
     dispatch({ type: DELETE_EMPLOYEE_REQUEST });
     try {
-      await deleteEmployee(id);
+      await apiDeleteEmployee(id);
       dispatch({ type: DELETE_EMPLOYEE_SUCCESS, payload: id });
     } catch (error: any) {
       dispatch({ type: DELETE_EMPLOYEE_FAILURE, payload: error.message });
@@ -79,7 +79,7 @@ export const fetchEmployeeByIdAction = (
   return async (dispatch: Dispatch) => {
     dispatch({ type: FETCH_EMPLOYEE_BY_ID_REQUEST });
     try {
-      const employee = await fetchEmployeeById(id);
+      const employee = await apiFetchEmployeeById(id);
       dispatch({ type: FETCH_EMPLOYEE_BY_ID_SUCCESS, payload: employee });
     } catch (error: any) {
       dispatch({ type: FETCH_EMPLOYEE_BY_ID_FAILURE, payload: error.message });
@@ -94,7 +94,7 @@ export const updateEmployeeAction = (
   return async (dispatch: Dispatch) => {
     dispatch({ type: UPDATE_EMPLOYEE_REQUEST });
     try {
-      await updateEmployee(id, employee);
+      await apiUpdateEmployee(id, employee);
       dispatch({ type: UPDATE_EMPLOYEE_SUCCESS });
     } catch (error: any) {
       dispatch({ type: UPDATE_EMPLOYEE_FAILURE, payload: error.message });

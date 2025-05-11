@@ -3,7 +3,10 @@ import { Button, Table, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Assignment } from "../types/types";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { fetchAssignments, deleteAssignment } from "../utils/api/assignmentApi";
+import {
+  apiFetchAssignments,
+  apiDeleteAssignment,
+} from "../utils/api/assignmentApi";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const AssignmentsPage: React.FC = () => {
@@ -19,7 +22,7 @@ const AssignmentsPage: React.FC = () => {
   useEffect(() => {
     const getAssignments = async () => {
       try {
-        const data = await fetchAssignments();
+        const data = await apiFetchAssignments();
         setAssignments(data);
       } catch (error) {
         console.error("Error fetching assignments:", error);
@@ -40,8 +43,8 @@ const AssignmentsPage: React.FC = () => {
     if (assignmentToDelete !== null) {
       setDeleting(true);
       try {
-        await deleteAssignment(assignmentToDelete);
-        const updatedAssignments = await fetchAssignments();
+        await apiDeleteAssignment(assignmentToDelete);
+        const updatedAssignments = await apiFetchAssignments();
         setAssignments(updatedAssignments);
       } catch (error) {
         console.error("Error deleting assignment:", error);

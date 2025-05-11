@@ -3,7 +3,7 @@ import { Employee, NewEmployee } from "../../types/types";
 
 const API_BASE_URL = "http://localhost:5088/api";
 
-export const fetchEmployees = async (): Promise<Employee[]> => {
+export const apiFetchEmployees = async (): Promise<Employee[]> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Employee`);
     return response.data;
@@ -13,7 +13,7 @@ export const fetchEmployees = async (): Promise<Employee[]> => {
   }
 };
 
-export const deleteEmployee = async (id: number): Promise<void> => {
+export const apiDeleteEmployee = async (id: number): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Employee/${id}`);
   } catch (error) {
@@ -22,7 +22,7 @@ export const deleteEmployee = async (id: number): Promise<void> => {
   }
 };
 
-export const addEmployee = async (employee: NewEmployee): Promise<void> => {
+export const apiAddEmployee = async (employee: NewEmployee): Promise<void> => {
   try {
     await axios.post(`${API_BASE_URL}/Employee`, employee);
   } catch (error) {
@@ -31,7 +31,7 @@ export const addEmployee = async (employee: NewEmployee): Promise<void> => {
   }
 };
 
-export const fetchEmployeeById = async (id: string): Promise<Employee> => {
+export const apiFetchEmployeeById = async (id: string): Promise<Employee> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Employee/${id}`);
     return response.data;
@@ -41,7 +41,7 @@ export const fetchEmployeeById = async (id: string): Promise<Employee> => {
   }
 };
 
-export const updateEmployee = async (
+export const apiUpdateEmployee = async (
   id: string,
   employee: Employee
 ): Promise<void> => {

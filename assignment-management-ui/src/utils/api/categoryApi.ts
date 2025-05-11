@@ -13,7 +13,7 @@ export const apiFetchCategories = async (): Promise<Category[]> => {
   }
 };
 
-export const fetchCategoryById = async (id: string): Promise<Category> => {
+export const apiFetchCategoryById = async (id: string): Promise<Category> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Category/${id}`);
     return response.data;
@@ -23,7 +23,7 @@ export const fetchCategoryById = async (id: string): Promise<Category> => {
   }
 };
 
-export const updateCategory = async (
+export const apiUpdateCategory = async (
   id: string,
   category: Category
 ): Promise<void> => {

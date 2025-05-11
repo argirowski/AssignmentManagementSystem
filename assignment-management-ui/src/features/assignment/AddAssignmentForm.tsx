@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiFetchCategories } from "../../utils/api/categoryApi";
-import { fetchEmployees } from "../../utils/api/employeeApi";
+import { apiFetchEmployees } from "../../utils/api/employeeApi";
 import { apiFetchStatuses } from "../../utils/api/statusApi";
 import {
   Category,
@@ -12,7 +12,7 @@ import {
   CreateAssignment,
   EmployeeSelect,
 } from "../../types/types";
-import { addAssignment } from "../../utils/api/assignmentApi";
+import { apiAddAssignment } from "../../utils/api/assignmentApi";
 import Select from "react-select";
 import { assignmentSchema } from "../../utils/validation";
 
@@ -49,10 +49,12 @@ const AddAssignmentForm: React.FC = () => {
           })
         );
 
-        const employeesData = (await fetchEmployees()).map((employee: any) => ({
-          id: employee.id.toString(),
-          fullName: employee.fullName,
-        }));
+        const employeesData = (await apiFetchEmployees()).map(
+          (employee: any) => ({
+            id: employee.id.toString(),
+            fullName: employee.fullName,
+          })
+        );
 
         const statusesData = (await apiFetchStatuses()).map((status: any) => ({
           id: status.id.toString(),
@@ -72,7 +74,7 @@ const AddAssignmentForm: React.FC = () => {
 
   const onSubmit = async (data: CreateAssignment) => {
     try {
-      await addAssignment({
+      await apiAddAssignment({
         title: data.title,
         description: data.description,
         isCompleted: data.isCompleted,

@@ -23,8 +23,8 @@ import {
   apiFetchCategories,
   apiAddCategory,
   apiDeleteCategory,
-  fetchCategoryById,
-  updateCategory,
+  apiFetchCategoryById,
+  apiUpdateCategory,
 } from "../../utils/api/categoryApi";
 import { Category } from "../../types/types";
 
@@ -79,7 +79,7 @@ export const fetchCategoryByIdAction = (
   return async (dispatch: Dispatch) => {
     dispatch({ type: FETCH_CATEGORY_BY_ID_REQUEST });
     try {
-      const category = await fetchCategoryById(id.toString());
+      const category = await apiFetchCategoryById(id.toString());
       dispatch({ type: FETCH_CATEGORY_BY_ID_SUCCESS, payload: category });
     } catch (error: any) {
       dispatch({ type: FETCH_CATEGORY_BY_ID_FAILURE, payload: error.message });
@@ -94,7 +94,7 @@ export const updateCategoryAction = (
   return async (dispatch: Dispatch) => {
     dispatch({ type: UPDATE_CATEGORY_REQUEST });
     try {
-      await updateCategory(id, category);
+      await apiUpdateCategory(id, category);
       dispatch({ type: UPDATE_CATEGORY_SUCCESS });
     } catch (error: any) {
       dispatch({ type: UPDATE_CATEGORY_FAILURE, payload: error.message });

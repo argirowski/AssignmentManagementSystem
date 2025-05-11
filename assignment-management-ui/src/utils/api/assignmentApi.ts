@@ -3,7 +3,7 @@ import { Assignment, CreateAssignment } from "../../types/types";
 
 const API_BASE_URL = "http://localhost:5088/api";
 
-export const fetchAssignments = async (): Promise<Assignment[]> => {
+export const apiFetchAssignments = async (): Promise<Assignment[]> => {
   try {
     const response = await axios.get(`${API_BASE_URL}/Assignment`);
     return response.data;
@@ -13,7 +13,7 @@ export const fetchAssignments = async (): Promise<Assignment[]> => {
   }
 };
 
-export const deleteAssignment = async (id: string): Promise<void> => {
+export const apiDeleteAssignment = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Assignment/${id}`);
   } catch (error) {
@@ -22,7 +22,7 @@ export const deleteAssignment = async (id: string): Promise<void> => {
   }
 };
 
-export const addAssignment = async (
+export const apiAddAssignment = async (
   assignmentData: CreateAssignment
 ): Promise<void> => {
   try {
