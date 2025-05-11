@@ -3,7 +3,9 @@ import { Container, Form, Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addEmployee } from "../../utils/api/employeeApi";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { addEmployeeAction } from "../../redux/employee/employeeActions";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { employeeSchema, EmployeeFormData } from "../../utils/validation";
 
@@ -19,6 +21,7 @@ const AddEmployeeForm: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
 
   const handleCancel = () => {
     if (isDirty) {
@@ -39,7 +42,7 @@ const AddEmployeeForm: React.FC = () => {
 
   const onSubmit = async (data: EmployeeFormData) => {
     try {
-      await addEmployee({ ...data });
+      await dispatch(addEmployeeAction({ ...data }));
       navigate("/employees");
     } catch (error) {
       console.error("Error adding employee:", error);

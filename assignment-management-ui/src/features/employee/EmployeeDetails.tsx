@@ -1,27 +1,33 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Container, Card, Button } from "react-bootstrap";
-import { Employee } from "../../types/types";
-import { fetchEmployeeById } from "../../utils/api/employeeApi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, AppState } from "../../store";
+import { fetchEmployeeByIdAction } from "../../redux/employee/employeeActions";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EmployeeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [employee, setEmployee] = useState<Employee | null>(null);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const { employees, loading, error } = useSelector(
+    (state: AppState) => state.employees
+  );
+  const employee = employees.length > 0 ? employees[0] : null;
 
   useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        const data = await fetchEmployeeById(id!);
-        setEmployee(data);
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
+    if (id) {
+      dispatch(fetchEmployeeByIdAction(id));
+    }
+  }, [dispatch, id]);
 
-    fetchEmployee();
-  }, [id]);
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!employee) {
     return <LoadingSpinner />;

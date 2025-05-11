@@ -9,6 +9,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { Status } from "./types/types";
 import statusesReducer from "./redux/status/statusesReducer";
 import categoriesReducer from "./redux/category/categoriesReducer";
+import employeesReducer from "./redux/employee/employeesReducer";
 
 export type StatusesState = {
   statuses: Status[];
@@ -20,6 +21,7 @@ export type StatusesState = {
 const rootReducer = combineReducers({
   statuses: statusesReducer,
   categories: categoriesReducer, // Added categories reducer
+  employees: employeesReducer, // Added employees reducer
   // Add reducers here, e.g., assignment: assignmentReducer
 });
 

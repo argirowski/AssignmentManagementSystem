@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import { Employee } from "../../types/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fetchEmployeeById, updateEmployee } from "../../utils/api/employeeApi";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, AppState } from "../../store";
+import {
+  fetchEmployeeByIdAction,
+  updateEmployeeAction,
+} from "../../redux/employee/employeeActions";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { employeeSchema, EmployeeFormData } from "../../utils/validation";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
 const EditEmployeeForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [employee, setEmployee] = useState<Employee | null>(null);
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+  const { employees, loading, error } = useSelector(
+    (state: AppState) => state.employees
+  );
+  const employee = employees.length > 0 ? employees[0] : null;
 
   const {
     register,
@@ -27,22 +35,20 @@ const EditEmployeeForm: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        const data = await fetchEmployeeById(id!);
-        setEmployee(data);
-        reset({ fullName: data.fullName, email: data.email });
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
+    if (id) {
+      dispatch(fetchEmployeeByIdAction(id));
+    }
+  }, [dispatch, id]);
 
-    fetchEmployee();
-  }, [id, reset]);
+  useEffect(() => {
+    if (employee) {
+      reset({ fullName: employee.fullName, email: employee.email });
+    }
+  }, [employee, reset]);
 
   const onSubmit = async (data: EmployeeFormData) => {
     try {
-      await updateEmployee(id!, { id: employee?.id!, ...data });
+      await dispatch(updateEmployeeAction(id!, { id: employee?.id!, ...data }));
       navigate(`/employees`);
     } catch (error) {
       console.error("Error updating employee:", error);
@@ -65,6 +71,14 @@ const EditEmployeeForm: React.FC = () => {
   const closeModal = () => {
     setShowModal(false);
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   if (!employee) {
     return <LoadingSpinner />;

@@ -1,33 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { fetchEmployees, deleteEmployee } from "../utils/api/employeeApi";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
-import { Employee } from "../types/types";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, AppState } from "../store";
+import {
+  fetchEmployeesAction,
+  deleteEmployeeAction,
+} from "../redux/employee/employeeActions";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 const EmployeesPage: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const dispatch: AppDispatch = useDispatch();
+  const { employees, loading } = useSelector(
+    (state: AppState) => state.employees
+  );
   const [showModal, setShowModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getEmployees = async () => {
-      try {
-        const data = await fetchEmployees();
-        setEmployees(data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getEmployees();
-  }, []);
+    dispatch(fetchEmployeesAction());
+  }, [dispatch]);
 
   const handleDelete = (id: number) => {
     setEmployeeToDelete(id);
@@ -38,10 +33,7 @@ const EmployeesPage: React.FC = () => {
     if (employeeToDelete !== null) {
       setDeleting(true);
       try {
-        await deleteEmployee(employeeToDelete);
-        setEmployees((prevEmployees) =>
-          prevEmployees.filter((employee) => employee.id !== employeeToDelete)
-        );
+        await dispatch(deleteEmployeeAction(employeeToDelete));
       } catch (error) {
         console.error("Error deleting employee:", error);
       } finally {
