@@ -13,6 +13,8 @@ import {
   fetchStatusByIdAction,
   updateStatusAction,
 } from "../../redux/status/statusActions";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const EditStatusForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,11 +84,11 @@ const EditStatusForm: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!status) {
-    return <LoadingSpinner />;
+    return <NotFoundComponent message="Status not found." />;
   }
 
   return (

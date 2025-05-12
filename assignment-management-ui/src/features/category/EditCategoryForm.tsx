@@ -12,6 +12,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const EditCategoryForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,11 +84,11 @@ const EditCategoryForm: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!category) {
-    return <LoadingSpinner />;
+    return <NotFoundComponent message="Category not found." />;
   }
 
   return (

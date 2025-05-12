@@ -5,16 +5,19 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAssignmentByIdAction } from "../../redux/assignment/assignmentActions";
 import { AppState, AppDispatch } from "../../store";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const AssignmentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
   const assignment = useSelector(
     (state: AppState) => state.assignments.assignmentDetails
   );
   const loading = useSelector((state: AppState) => state.assignments.loading);
   const error = useSelector((state: AppState) => state.assignments.error);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
@@ -27,11 +30,11 @@ const AssignmentDetails: React.FC = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!assignment) {
-    return <div>No assignment found.</div>;
+    return <NotFoundComponent message="Assignment not found." />;
   }
 
   return (

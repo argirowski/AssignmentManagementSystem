@@ -12,6 +12,8 @@ import {
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { employeeSchema, EmployeeFormData } from "../../utils/validation";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const EditEmployeeForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +23,7 @@ const EditEmployeeForm: React.FC = () => {
     (state: AppState) => state.employees
   );
   const employee = employees.length > 0 ? employees[0] : null;
+  const [showModal, setShowModal] = useState(false);
 
   const {
     register,
@@ -31,8 +34,6 @@ const EditEmployeeForm: React.FC = () => {
     resolver: zodResolver(employeeSchema),
     defaultValues: { fullName: "", email: "" },
   });
-
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -77,13 +78,12 @@ const EditEmployeeForm: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!employee) {
-    return <LoadingSpinner />;
+    return <NotFoundComponent message="Employee not found." />;
   }
-
   return (
     <Container
       style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}

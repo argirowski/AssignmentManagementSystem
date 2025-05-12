@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppState, AppDispatch } from "../../store";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { fetchStatusByIdAction } from "../../redux/status/statusActions";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const StatusDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,11 +29,11 @@ const StatusDetails: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!status) {
-    return <p>Status not found.</p>;
+    return <NotFoundComponent message="Status not found." />;
   }
 
   return (

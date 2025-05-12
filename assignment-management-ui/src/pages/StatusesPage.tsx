@@ -11,6 +11,7 @@ import {
   fetchStatusesAction,
   deleteStatusAction,
 } from "../redux/status/statusActions";
+import ErrorComponent from "../components/ErrorComponent";
 const StatusesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -18,7 +19,6 @@ const StatusesPage: React.FC = () => {
     (state: AppState) => state.statuses
   );
 
-  // Add type annotation for statuses
   const typedStatuses: Status[] = statuses;
 
   const [showModal, setShowModal] = useState(false);
@@ -54,12 +54,12 @@ const StatusesPage: React.FC = () => {
     setStatusToDelete(null);
   };
 
-  if (loading) {
+  if (loading || deleting) {
     return <LoadingSpinner />;
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   return (

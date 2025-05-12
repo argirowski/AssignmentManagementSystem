@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppState, AppDispatch } from "../../store";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { fetchCategoryByIdAction } from "../../redux/category/categoryActions";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const CategoryDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,11 +29,11 @@ const CategoryDetails: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!category) {
-    return <p>Status not found.</p>;
+    return <NotFoundComponent message="Category not found." />;
   }
 
   return (

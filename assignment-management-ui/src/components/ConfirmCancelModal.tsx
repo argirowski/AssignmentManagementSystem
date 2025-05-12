@@ -1,11 +1,6 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-
-interface ConfirmCancelModalProps {
-  show: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-}
+import { ConfirmCancelModalProps } from "../types/types";
 
 const ConfirmCancelModal: React.FC<ConfirmCancelModalProps> = ({
   show,

@@ -15,15 +15,6 @@ import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
 import { fetchCategoriesAction } from "../../redux/category/categoryActions";
 
 const AddAssignmentForm: React.FC = () => {
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
-  const dispatch: AppDispatch = useDispatch();
-  const statuses = useSelector((state: AppState) => state.statuses.statuses);
-  const employees = useSelector((state: AppState) => state.employees.employees);
-  const categories = useSelector(
-    (state: AppState) => state.categories.categories
-  );
-
   const {
     register,
     handleSubmit,
@@ -41,16 +32,46 @@ const AddAssignmentForm: React.FC = () => {
     },
   });
 
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const dispatch: AppDispatch = useDispatch();
+  const statuses = useSelector((state: AppState) => state.statuses.statuses);
+  const employees = useSelector((state: AppState) => state.employees.employees);
+  const categories = useSelector(
+    (state: AppState) => state.categories.categories
+  );
+
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowModal(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmCancel = () => {
+    setShowModal(false);
+    navigate(-1);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const onSubmit = async (data: CreateAssignment) => {
+    try {
+      await dispatch(addAssignmentAction(data));
+      navigate("/assignments");
+    } catch (error) {
+      console.error("Error adding assignment:", error);
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchCategoriesAction());
     dispatch(fetchStatusesAction());
     dispatch(fetchEmployeesAction());
   }, [dispatch]);
-
-  const onSubmit = (data: CreateAssignment) => {
-    dispatch(addAssignmentAction(data));
-    navigate("/assignments");
-  };
 
   const categoryOptions = categories.map((category) => ({
     value: category.id,
@@ -81,23 +102,6 @@ const AddAssignmentForm: React.FC = () => {
         shouldDirty: true,
       });
     }
-  };
-
-  const handleCancel = () => {
-    if (isDirty) {
-      setShowModal(true);
-    } else {
-      navigate(-1);
-    }
-  };
-
-  const confirmCancel = () => {
-    setShowModal(false);
-    navigate(-1);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
   };
 
   return (

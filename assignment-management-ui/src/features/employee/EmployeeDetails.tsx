@@ -5,11 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, AppState } from "../../store";
 import { fetchEmployeeByIdAction } from "../../redux/employee/employeeActions";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import ErrorComponent from "../../components/ErrorComponent";
+import NotFoundComponent from "../../components/NotFoundComponent";
 
 const EmployeeDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
+
   const { employees, loading, error } = useSelector(
     (state: AppState) => state.employees
   );
@@ -26,11 +29,11 @@ const EmployeeDetails: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   if (!employee) {
-    return <LoadingSpinner />;
+    return <NotFoundComponent message="Employee not found." />;
   }
 
   return (

@@ -43,3 +43,19 @@ export type CreateAssignment = {
   statusId: string;
   categoryIds: string[];
 };
+
+export type ErrorComponentProps = {
+  message: string;
+};
+
+export type ConfirmCancelModalProps = {
+  show: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+};
+
+export type ConfirmDeleteModalProps = {
+  show: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+};

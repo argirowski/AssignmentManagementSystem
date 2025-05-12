@@ -9,14 +9,13 @@ import {
 import { AppState, AppDispatch } from "../store";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import ErrorComponent from "../components/ErrorComponent";
 
 const AssignmentsPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
-  const assignments = useSelector(
-    (state: AppState) => state.assignments.assignments
+  const { assignments, loading, error } = useSelector(
+    (state: AppState) => state.assignments
   );
-  const loading = useSelector((state: AppState) => state.assignments.loading);
-  const error = useSelector((state: AppState) => state.assignments.error);
 
   const [showModal, setShowModal] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(
@@ -51,7 +50,7 @@ const AssignmentsPage: React.FC = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <ErrorComponent message={error} />;
   }
 
   return (

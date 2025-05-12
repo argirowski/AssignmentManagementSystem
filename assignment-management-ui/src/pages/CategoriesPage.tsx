@@ -10,6 +10,7 @@ import {
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { AppState, AppDispatch } from "../store";
+import ErrorComponent from "../components/ErrorComponent";
 
 const CategoriesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
@@ -18,7 +19,6 @@ const CategoriesPage: React.FC = () => {
     (state: AppState) => state.categories
   );
 
-  // Add type annotation for statuses
   const typedCategories: Category[] = categories;
 
   const [showModal, setShowModal] = useState(false);
@@ -59,7 +59,7 @@ const CategoriesPage: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <ErrorComponent message={error} />;
   }
 
   return (

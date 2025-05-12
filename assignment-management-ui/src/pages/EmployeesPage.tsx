@@ -9,10 +9,11 @@ import {
 } from "../redux/employee/employeeActions";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorComponent from "../components/ErrorComponent";
 
 const EmployeesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { employees, loading } = useSelector(
+  const { employees, loading, error } = useSelector(
     (state: AppState) => state.employees
   );
   const [showModal, setShowModal] = useState(false);
@@ -51,6 +52,10 @@ const EmployeesPage: React.FC = () => {
 
   if (loading || deleting) {
     return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorComponent message={error} />;
   }
 
   return (
