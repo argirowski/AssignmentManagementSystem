@@ -1,4 +1,3 @@
-import { Dispatch } from "redux";
 import { ThunkAction } from "redux-thunk";
 import { AnyAction } from "redux";
 import { AppState } from "../../store";
@@ -29,8 +28,13 @@ import {
 import { Status } from "../../types/types";
 
 // Action creator for fetching statuses
-export const fetchStatusesAction = () => {
-  return async (dispatch: Dispatch) => {
+export const fetchStatusesAction = (): ThunkAction<
+  void,
+  AppState,
+  unknown,
+  AnyAction
+> => {
+  return async (dispatch) => {
     dispatch({ type: FETCH_STATUSES_REQUEST });
     try {
       const statuses = await apiFetchStatuses();

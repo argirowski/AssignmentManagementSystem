@@ -3,26 +3,26 @@ import { Form, Button, Container, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { apiFetchCategories } from "../../utils/api/categoryApi";
-import { apiFetchEmployees } from "../../utils/api/employeeApi";
-import { apiFetchStatuses } from "../../utils/api/statusApi";
-import {
-  Category,
-  Status,
-  CreateAssignment,
-  EmployeeSelect,
-} from "../../types/types";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchStatusesAction } from "../../redux/status/statusActions";
+import { AppState, AppDispatch } from "../../store";
+import { CreateAssignment } from "../../types/types";
 import { apiAddAssignment } from "../../utils/api/assignmentApi";
 import Select from "react-select";
 import { assignmentSchema } from "../../utils/validation";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
+import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
+import { fetchCategoriesAction } from "../../redux/category/categoryActions";
 
 const AddAssignmentForm: React.FC = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [employees, setEmployees] = useState<EmployeeSelect[]>([]);
-  const [statuses, setStatuses] = useState<Status[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const dispatch: AppDispatch = useDispatch();
+  const statuses = useSelector((state: AppState) => state.statuses.statuses);
+  const employees = useSelector((state: AppState) => state.employees.employees);
+  const categories = useSelector(
+    (state: AppState) => state.categories.categories
+  );
 
   const {
     register,
@@ -42,37 +42,10 @@ const AddAssignmentForm: React.FC = () => {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const categoriesData = (await apiFetchCategories()).map(
-          (category: any) => ({
-            id: category.id.toString(),
-            name: category.name,
-          })
-        );
-
-        const employeesData = (await apiFetchEmployees()).map(
-          (employee: any) => ({
-            id: employee.id.toString(),
-            fullName: employee.fullName,
-          })
-        );
-
-        const statusesData = (await apiFetchStatuses()).map((status: any) => ({
-          id: status.id.toString(),
-          description: status.description,
-        }));
-
-        setCategories(categoriesData);
-        setEmployees(employeesData);
-        setStatuses(statusesData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    dispatch(fetchCategoriesAction());
+    dispatch(fetchStatusesAction());
+    dispatch(fetchEmployeesAction());
+  }, [dispatch]);
 
   const onSubmit = async (data: CreateAssignment) => {
     try {
