@@ -1,35 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
-import axios from "axios";
 import LoadingSpinner from "../../components/LoadingSpinner";
-
-type Employee = {
-  id: number;
-  fullName: string;
-  email: string;
-};
-
-type Status = {
-  id: number;
-  description: string;
-};
-
-type Category = {
-  id: number;
-  name: string;
-};
-
-type Assignment = {
-  id: number;
-  title: string;
-  description: string;
-  isCompleted: boolean;
-  createdAt: string;
-  employee: Employee;
-  status: Status;
-  categories: Category[];
-};
+import { Assignment } from "../../types/types";
+import { apiFetchAssignmentById } from "../../utils/api/assignmentApi";
 
 const AssignmentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,10 +13,8 @@ const AssignmentDetails: React.FC = () => {
   useEffect(() => {
     const fetchAssignment = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5088/api/Assignment/${id}`
-        );
-        setAssignment(response.data);
+        const assignmentData = await apiFetchAssignmentById(id!);
+        setAssignment(assignmentData);
       } catch (error) {
         console.error("Error fetching assignment details:", error);
       }

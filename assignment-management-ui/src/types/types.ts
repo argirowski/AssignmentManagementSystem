@@ -27,6 +27,7 @@ export type Assignment = {
   title: string;
   description: string;
   isCompleted: boolean;
+  createdAt: string;
   employee: Employee;
   status: Status;
   categories: Category[];

@@ -13,6 +13,18 @@ export const apiFetchAssignments = async (): Promise<Assignment[]> => {
   }
 };
 
+export const apiFetchAssignmentById = async (
+  id: string
+): Promise<Assignment> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/Assignment/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching assignment details:", error);
+    throw error;
+  }
+};
+
 export const apiDeleteAssignment = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Assignment/${id}`);

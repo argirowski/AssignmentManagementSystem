@@ -18,13 +18,12 @@ import {
 import { AnyAction } from "redux";
 import { Employee } from "../../types/types";
 
-interface EmployeesState {
+// Define the initial state for employees
+const initialState: {
   employees: Employee[];
   loading: boolean;
   error: string | null;
-}
-
-const initialState: EmployeesState = {
+} = {
   employees: [],
   loading: false,
   error: null,
@@ -33,7 +32,7 @@ const initialState: EmployeesState = {
 const employeesReducer = (
   state = initialState,
   action: AnyAction
-): EmployeesState => {
+): typeof initialState => {
   switch (action.type) {
     case FETCH_EMPLOYEES_REQUEST:
     case ADD_EMPLOYEE_REQUEST:
