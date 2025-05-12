@@ -44,7 +44,7 @@ export const apiAddCategory = async (name: string): Promise<void> => {
   }
 };
 
-export const apiDeleteCategory = async (id: number): Promise<void> => {
+export const apiDeleteCategory = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Category/${id}`);
   } catch (error) {

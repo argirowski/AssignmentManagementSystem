@@ -85,7 +85,7 @@ export const updateStatusAction = (
 };
 
 export const deleteStatusAction = (
-  id: number
+  id: string
 ): ThunkAction<void, AppState, unknown, AnyAction> => {
   return async (dispatch) => {
     dispatch({ type: DELETE_STATUS_REQUEST });

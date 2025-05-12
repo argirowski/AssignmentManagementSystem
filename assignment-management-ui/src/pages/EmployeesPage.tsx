@@ -16,7 +16,7 @@ const EmployeesPage: React.FC = () => {
     (state: AppState) => state.employees
   );
   const [showModal, setShowModal] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState<number | null>(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const EmployeesPage: React.FC = () => {
     dispatch(fetchEmployeesAction());
   }, [dispatch]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     setEmployeeToDelete(id);
     setShowModal(true);
   };

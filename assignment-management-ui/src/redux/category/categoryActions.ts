@@ -60,7 +60,7 @@ export const addCategoryAction = (
 };
 
 export const deleteCategoryAction = (
-  id: number
+  id: string
 ): ThunkAction<void, AppState, unknown, AnyAction> => {
   return async (dispatch: Dispatch) => {
     dispatch({ type: DELETE_CATEGORY_REQUEST });

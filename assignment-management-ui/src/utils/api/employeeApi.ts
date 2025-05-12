@@ -13,7 +13,7 @@ export const apiFetchEmployees = async (): Promise<Employee[]> => {
   }
 };
 
-export const apiDeleteEmployee = async (id: number): Promise<void> => {
+export const apiDeleteEmployee = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Employee/${id}`);
   } catch (error) {

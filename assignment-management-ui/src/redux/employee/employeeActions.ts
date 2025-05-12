@@ -60,7 +60,7 @@ export const addEmployeeAction = (
 };
 
 export const deleteEmployeeAction = (
-  id: number
+  id: string
 ): ThunkAction<void, AppState, unknown, AnyAction> => {
   return async (dispatch: Dispatch) => {
     dispatch({ type: DELETE_EMPLOYEE_REQUEST });

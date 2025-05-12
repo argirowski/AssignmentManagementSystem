@@ -13,7 +13,7 @@ export const apiFetchStatuses = async (): Promise<Status[]> => {
   }
 };
 
-export const apiDeleteStatus = async (id: number): Promise<void> => {
+export const apiDeleteStatus = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${API_BASE_URL}/Status/${id}`);
   } catch (error) {

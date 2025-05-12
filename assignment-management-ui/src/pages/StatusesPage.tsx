@@ -22,14 +22,14 @@ const StatusesPage: React.FC = () => {
   const typedStatuses: Status[] = statuses;
 
   const [showModal, setShowModal] = useState(false);
-  const [statusToDelete, setStatusToDelete] = useState<number | null>(null);
+  const [statusToDelete, setStatusToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStatusesAction());
   }, [dispatch]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     setStatusToDelete(id);
     setShowModal(true);
   };

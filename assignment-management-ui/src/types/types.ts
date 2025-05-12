@@ -1,5 +1,5 @@
 export type Employee = {
-  id: number;
+  id: string;
   fullName: string;
   email: string;
 };
@@ -9,7 +9,7 @@ export type NewEmployee = Omit<Employee, "id">;
 export type EmployeeSelect = Omit<Employee, "email">;
 
 export type Status = {
-  id: number;
+  id: string;
   description: string;
 };
 
@@ -18,7 +18,7 @@ export type StatusFormData = {
 };
 
 export type Category = {
-  id: number;
+  id: string;
   name: string;
 };
 

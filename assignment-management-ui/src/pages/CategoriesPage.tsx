@@ -22,14 +22,14 @@ const CategoriesPage: React.FC = () => {
   const typedCategories: Category[] = categories;
 
   const [showModal, setShowModal] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCategoriesAction());
   }, [dispatch]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     setCategoryToDelete(id);
     setShowModal(true);
   };

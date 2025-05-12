@@ -4,6 +4,7 @@ import { Container, Form, Button } from "react-bootstrap";
 import axios from "axios";
 import { Assignment, Category, Employee, Status } from "../../types/types";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import Select from "react-select";
 
 const EditAssignmentForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -11,9 +12,9 @@ const EditAssignmentForm: React.FC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
-  const [employeeId, setEmployeeId] = useState<number | "">("");
-  const [statusId, setStatusId] = useState<number | "">("");
-  const [categoryIds, setCategoryIds] = useState<number[]>([]);
+  const [employeeId, setEmployeeId] = useState<string>("");
+  const [statusId, setStatusId] = useState<string>("");
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -30,9 +31,11 @@ const EditAssignmentForm: React.FC = () => {
         setTitle(data.title);
         setDescription(data.description);
         setIsCompleted(data.isCompleted);
-        setEmployeeId(data.employeeId);
-        setStatusId(data.statusId);
-        setCategoryIds(data.categoryIds);
+        setEmployeeId(data.employee.id);
+        setStatusId(data.status.id);
+        setCategoryIds(
+          data.categories.map((category: { id: string }) => category.id)
+        );
       } catch (error) {
         console.error("Error fetching assignment details:", error);
       }
@@ -113,7 +116,7 @@ const EditAssignmentForm: React.FC = () => {
           <Form.Label>Employee</Form.Label>
           <Form.Select
             value={employeeId}
-            onChange={(e) => setEmployeeId(Number(e.target.value))}
+            onChange={(e) => setEmployeeId(e.target.value)}
             disabled={!employees.length}
           >
             <option value="">Select an employee</option>
@@ -128,7 +131,7 @@ const EditAssignmentForm: React.FC = () => {
           <Form.Label>Status</Form.Label>
           <Form.Select
             value={statusId}
-            onChange={(e) => setStatusId(Number(e.target.value))}
+            onChange={(e) => setStatusId(e.target.value)}
             disabled={!statuses.length}
           >
             <option value="">Select a status</option>
@@ -139,27 +142,30 @@ const EditAssignmentForm: React.FC = () => {
             ))}
           </Form.Select>
         </Form.Group>
-        {/* <Form.Group className="mb-3" controlId="formAssignmentCategories">
+        <Form.Group className="mb-3" controlId="formAssignmentCategories">
           <Form.Label>Categories</Form.Label>
-          <Form.Select
-            multiple
-            value={categoryIds.map(String)}
-            onChange={(e) =>
+          <Select
+            isMulti
+            options={categories.map((category) => ({
+              value: category.id,
+              label: category.name,
+            }))}
+            value={categoryIds
+              .map((id) => {
+                const category = categories.find((cat) => cat.id === id);
+                return category
+                  ? { value: category.id, label: category.name }
+                  : null;
+              })
+              .filter(Boolean)}
+            onChange={(selectedOptions) =>
               setCategoryIds(
-                Array.from(e.target.selectedOptions, (option) =>
-                  Number(option.value)
-                )
+                selectedOptions.map((option) => option!.value.toString())
               )
             }
-            disabled={!categories.length}
-          >
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group> */}
+            placeholder="Select categories..."
+          />
+        </Form.Group>
         <Button variant="primary" onClick={handleSave}>
           Save
         </Button>
