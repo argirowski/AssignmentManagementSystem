@@ -15,18 +15,20 @@ import {
 import { apiAddAssignment } from "../../utils/api/assignmentApi";
 import Select from "react-select";
 import { assignmentSchema } from "../../utils/validation";
+import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 
 const AddAssignmentForm: React.FC = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [employees, setEmployees] = useState<EmployeeSelect[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
+  const [showModal, setShowModal] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<CreateAssignment>({
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
@@ -95,7 +97,45 @@ const AddAssignmentForm: React.FC = () => {
 
   const onCategoryChange = (selectedOptions: any) => {
     const values = selectedOptions.map((option: any) => option.value);
-    setValue("categoryIds", values, { shouldValidate: true });
+    setValue("categoryIds", values, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
+  const onEmployeeChange = (event: React.ChangeEvent<any>) => {
+    if (event.target instanceof HTMLSelectElement) {
+      setValue("employeeId", event.target.value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  };
+
+  const onStatusChange = (event: React.ChangeEvent<any>) => {
+    if (event.target instanceof HTMLSelectElement) {
+      setValue("statusId", event.target.value, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowModal(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const confirmCancel = () => {
+    setShowModal(false);
+    navigate(-1);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -162,6 +202,7 @@ const AddAssignmentForm: React.FC = () => {
                 as="select"
                 {...register("employeeId")}
                 isInvalid={!!errors.employeeId}
+                onChange={onEmployeeChange}
               >
                 <option value="">Select an employee</option>
                 {employees.map((employee) => (
@@ -181,6 +222,7 @@ const AddAssignmentForm: React.FC = () => {
                 as="select"
                 {...register("statusId")}
                 isInvalid={!!errors.statusId}
+                onChange={onStatusChange}
               >
                 <option value="">Select a status</option>
                 {statuses.map((status) => (
@@ -210,7 +252,7 @@ const AddAssignmentForm: React.FC = () => {
                 variant="secondary"
                 size="lg"
                 style={{ maxWidth: "10rem" }}
-                onClick={() => navigate(-1)}
+                onClick={handleCancel}
               >
                 Cancel
               </Button>
@@ -218,6 +260,11 @@ const AddAssignmentForm: React.FC = () => {
           </Form>
         </Card.Body>
       </Card>
+      <ConfirmCancelModal
+        show={showModal}
+        onConfirm={confirmCancel}
+        onCancel={closeModal}
+      />
     </Container>
   );
 };
