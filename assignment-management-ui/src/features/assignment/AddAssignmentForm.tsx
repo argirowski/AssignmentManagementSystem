@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchStatusesAction } from "../../redux/status/statusActions";
 import { AppState, AppDispatch } from "../../store";
 import { CreateAssignment } from "../../types/types";
-import { apiAddAssignment } from "../../utils/api/assignmentApi";
+import { addAssignmentAction } from "../../redux/assignment/assignmentActions";
 import Select from "react-select";
 import { assignmentSchema } from "../../utils/validation";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
@@ -47,20 +47,9 @@ const AddAssignmentForm: React.FC = () => {
     dispatch(fetchEmployeesAction());
   }, [dispatch]);
 
-  const onSubmit = async (data: CreateAssignment) => {
-    try {
-      await apiAddAssignment({
-        title: data.title,
-        description: data.description,
-        isCompleted: data.isCompleted,
-        categoryIds: data.categoryIds,
-        employeeId: data.employeeId,
-        statusId: data.statusId,
-      });
-      navigate("/assignments");
-    } catch (error) {
-      console.error("Error adding assignment:", error);
-    }
+  const onSubmit = (data: CreateAssignment) => {
+    dispatch(addAssignmentAction(data));
+    navigate("/assignments");
   };
 
   const categoryOptions = categories.map((category) => ({
