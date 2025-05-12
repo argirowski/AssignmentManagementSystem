@@ -21,10 +21,12 @@ import { Assignment } from "../../types/types";
 // Define the initial state for assignments
 const initialState: {
   assignments: Assignment[];
+  assignmentDetails: Assignment | null;
   loading: boolean;
   error: string | null;
 } = {
   assignments: [],
+  assignmentDetails: null,
   loading: false,
   error: null,
 };
@@ -43,7 +45,7 @@ const assignmentsReducer = (
     case FETCH_ASSIGNMENTS_SUCCESS:
       return { ...state, loading: false, assignments: action.payload };
     case FETCH_ASSIGNMENT_BY_ID_SUCCESS:
-      return { ...state, loading: false, assignments: [action.payload] };
+      return { ...state, loading: false, assignmentDetails: action.payload };
     case ADD_ASSIGNMENT_SUCCESS:
     case UPDATE_ASSIGNMENT_SUCCESS:
       return { ...state, loading: false };

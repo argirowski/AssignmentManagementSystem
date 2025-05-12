@@ -22,15 +22,17 @@ export type Category = {
   name: string;
 };
 
+export type NewCategory = Omit<Category, "id">;
+
 export type Assignment = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   isCompleted: boolean;
   createdAt: string;
-  employee: Employee;
-  status: Status;
-  categories: Category[];
+  employee: NewEmployee;
+  status: StatusFormData;
+  categories: NewCategory[];
 };
 
 export type CreateAssignment = {

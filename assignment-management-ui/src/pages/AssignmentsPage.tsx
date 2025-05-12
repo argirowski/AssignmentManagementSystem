@@ -1,58 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { Button, Table, Container } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { Assignment } from "../types/types";
-import LoadingSpinner from "../components/LoadingSpinner";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  apiFetchAssignments,
-  apiDeleteAssignment,
-} from "../utils/api/assignmentApi";
+  fetchAssignmentsAction,
+  deleteAssignmentAction,
+} from "../redux/assignment/assignmentActions";
+import { AppState, AppDispatch } from "../store";
+import LoadingSpinner from "../components/LoadingSpinner";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const AssignmentsPage: React.FC = () => {
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
+  const assignments = useSelector(
+    (state: AppState) => state.assignments.assignments
+  );
+  const loading = useSelector((state: AppState) => state.assignments.loading);
+  const error = useSelector((state: AppState) => state.assignments.error);
+
   const [showModal, setShowModal] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(
     null
   );
-  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getAssignments = async () => {
-      try {
-        const data = await apiFetchAssignments();
-        setAssignments(data);
-      } catch (error) {
-        console.error("Error fetching assignments:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getAssignments();
-  }, []);
+    dispatch(fetchAssignmentsAction());
+  }, [dispatch]);
 
   const handleDelete = (id: string) => {
     setAssignmentToDelete(id);
     setShowModal(true);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (assignmentToDelete !== null) {
-      setDeleting(true);
-      try {
-        await apiDeleteAssignment(assignmentToDelete);
-        const updatedAssignments = await apiFetchAssignments();
-        setAssignments(updatedAssignments);
-      } catch (error) {
-        console.error("Error deleting assignment:", error);
-      } finally {
-        setDeleting(false);
-        setShowModal(false);
-        setAssignmentToDelete(null);
-      }
+      dispatch(deleteAssignmentAction(assignmentToDelete));
+      setShowModal(false);
+      setAssignmentToDelete(null);
     }
   };
 
@@ -61,8 +46,12 @@ const AssignmentsPage: React.FC = () => {
     setAssignmentToDelete(null);
   };
 
-  if (loading || deleting) {
+  if (loading) {
     return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
@@ -96,7 +85,6 @@ const AssignmentsPage: React.FC = () => {
                   <td>{title}</td>
                   <td>{description}</td>
                   <td>{isCompleted ? "Yes" : "No"}</td>
-
                   <td>{employee.fullName}</td>
                   <td>{status.description}</td>
                   <td>

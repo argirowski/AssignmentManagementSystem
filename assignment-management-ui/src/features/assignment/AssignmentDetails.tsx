@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Button } from "react-bootstrap";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { Assignment } from "../../types/types";
-import { apiFetchAssignmentById } from "../../utils/api/assignmentApi";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAssignmentByIdAction } from "../../redux/assignment/assignmentActions";
+import { AppState, AppDispatch } from "../../store";
 
 const AssignmentDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [assignment, setAssignment] = useState<Assignment | null>(null);
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
+  const assignment = useSelector(
+    (state: AppState) => state.assignments.assignmentDetails
+  );
+  const loading = useSelector((state: AppState) => state.assignments.loading);
+  const error = useSelector((state: AppState) => state.assignments.error);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAssignment = async () => {
-      try {
-        const assignmentData = await apiFetchAssignmentById(id!);
-        setAssignment(assignmentData);
-      } catch (error) {
-        console.error("Error fetching assignment details:", error);
-      }
-    };
+    if (id) {
+      dispatch(fetchAssignmentByIdAction(id));
+    }
+  }, [dispatch, id]);
 
-    fetchAssignment();
-  }, [id]);
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   if (!assignment) {
-    return <LoadingSpinner />;
+    return <div>No assignment found.</div>;
   }
 
   return (
