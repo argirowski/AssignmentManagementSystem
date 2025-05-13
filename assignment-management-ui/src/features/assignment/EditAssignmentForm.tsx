@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import axios from "axios";
-import { Category, Employee, Status } from "../../types/types";
+import { CreateAssignment } from "../../types/types";
 import Select from "react-select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,21 +13,24 @@ import {
   handleCancel as reusableHandleCancel,
 } from "../../utils/modalHelpers";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
-
-interface EditAssignmentFormFields {
-  title: string;
-  description: string;
-  isCompleted: boolean;
-  employeeId: string;
-  statusId: string;
-  categoryIds: string[];
-}
+import { useSelector } from "react-redux";
+import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
+import { fetchStatusesAction } from "../../redux/status/statusActions";
+import { fetchCategoriesAction } from "../../redux/category/categoryActions";
+import { AppState } from "../../store";
 
 const EditAssignmentForm: React.FC = () => {
   const {
     navigate,
+    dispatch,
     params: { id },
   } = useCommonHooks();
+
+  const employees = useSelector((state: AppState) => state.employees.employees);
+  const statuses = useSelector((state: AppState) => state.statuses.statuses);
+  const categories = useSelector(
+    (state: AppState) => state.categories.categories
+  );
 
   const {
     register,
@@ -35,7 +38,7 @@ const EditAssignmentForm: React.FC = () => {
     setValue,
     formState: { errors, isDirty },
     reset,
-  } = useForm<EditAssignmentFormFields>({
+  } = useForm<CreateAssignment>({
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
       title: "",
@@ -47,9 +50,6 @@ const EditAssignmentForm: React.FC = () => {
     },
   });
 
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [statuses, setStatuses] = useState<Status[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -74,30 +74,16 @@ const EditAssignmentForm: React.FC = () => {
       }
     };
 
-    const fetchDependencies = async () => {
-      try {
-        const [employeesResponse, statusesResponse, categoriesResponse] =
-          await Promise.all([
-            axios.get("http://localhost:5088/api/Employee"),
-            axios.get("http://localhost:5088/api/Status"),
-            axios.get("http://localhost:5088/api/Category"),
-          ]);
-        setEmployees(employeesResponse.data);
-        setStatuses(statusesResponse.data);
-        setCategories(categoriesResponse.data);
-      } catch (error) {
-        console.error("Error fetching dependencies:", error);
-      }
-    };
-
     fetchAssignment();
-    fetchDependencies();
-  }, [id, reset]);
+    dispatch(fetchEmployeesAction());
+    dispatch(fetchStatusesAction());
+    dispatch(fetchCategoriesAction());
+  }, [id, reset, dispatch]);
 
   const handleCancel = () =>
     reusableHandleCancel(isDirty, setShowModal, navigate);
 
-  const onSubmit = async (data: EditAssignmentFormFields) => {
+  const onSubmit = async (data: CreateAssignment) => {
     try {
       await axios.put(`http://localhost:5088/api/Assignment/${id}`, data);
       navigate(`/assignments`);
