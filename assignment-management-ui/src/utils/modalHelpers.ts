@@ -13,3 +13,15 @@ export const confirmCancel = (
   setShowModal(false);
   navigate(-1);
 };
+
+export const handleCancel = (
+  isDirty: boolean,
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>,
+  navigate: (path: number) => void
+) => {
+  if (isDirty) {
+    setShowModal(true);
+  } else {
+    navigate(-1);
+  }
+};

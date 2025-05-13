@@ -13,7 +13,11 @@ import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
 import { fetchCategoriesAction } from "../../redux/category/categoryActions";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
-import { confirmCancel, closeModal } from "../../utils/modalHelpers";
+import {
+  confirmCancel,
+  closeModal,
+  handleCancel as reusableHandleCancel,
+} from "../../utils/modalHelpers";
 
 const AddAssignmentForm: React.FC = () => {
   const {
@@ -41,14 +45,8 @@ const AddAssignmentForm: React.FC = () => {
     (state: AppState) => state.categories.categories
   );
 
-  const handleCancel = () => {
-    if (isDirty) {
-      setShowModal(true);
-    } else {
-      navigate(-1);
-    }
-  };
-
+  const handleCancel = () =>
+    reusableHandleCancel(isDirty, setShowModal, navigate);
   const onSubmit = async (data: CreateAssignment) => {
     try {
       await dispatch(addAssignmentAction(data));

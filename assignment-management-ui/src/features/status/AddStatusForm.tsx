@@ -6,7 +6,11 @@ import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { statusSchema, StatusFormData } from "../../utils/validation";
 import { addStatusAction } from "../../redux/status/statusActions";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
-import { confirmCancel, closeModal } from "../../utils/modalHelpers";
+import {
+  confirmCancel,
+  closeModal,
+  handleCancel as reusableHandleCancel,
+} from "../../utils/modalHelpers";
 
 const AddStatusForm: React.FC = () => {
   const {
@@ -21,13 +25,8 @@ const AddStatusForm: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const { dispatch, navigate } = useCommonHooks();
 
-  const handleCancel = () => {
-    if (isDirty) {
-      setShowModal(true);
-    } else {
-      navigate(-1);
-    }
-  };
+  const handleCancel = () =>
+    reusableHandleCancel(isDirty, setShowModal, navigate);
 
   const onSubmit = async (data: StatusFormData) => {
     try {

@@ -13,7 +13,11 @@ import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
-import { closeModal, confirmCancel } from "../../utils/modalHelpers";
+import {
+  closeModal,
+  confirmCancel,
+  handleCancel as reusableHandleCancel,
+} from "../../utils/modalHelpers";
 
 const EditCategoryForm: React.FC = () => {
   const {
@@ -49,6 +53,9 @@ const EditCategoryForm: React.FC = () => {
     }
   }, [category, reset]);
 
+  const handleCancel = () =>
+    reusableHandleCancel(isDirty, setShowModal, navigate);
+
   const onSubmit = async (data: CategoryFormData) => {
     console.log("Submitting data:", { id: category?.id, name: data.name });
     try {
@@ -61,14 +68,6 @@ const EditCategoryForm: React.FC = () => {
       navigate(`/categories`);
     } catch (error) {
       console.error("Error updating category:", error);
-    }
-  };
-
-  const handleCancel = () => {
-    if (isDirty) {
-      setShowModal(true);
-    } else {
-      navigate(-1);
     }
   };
 

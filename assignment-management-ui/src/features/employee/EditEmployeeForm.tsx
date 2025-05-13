@@ -13,7 +13,11 @@ import { employeeSchema, EmployeeFormData } from "../../utils/validation";
 import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
-import { closeModal, confirmCancel } from "../../utils/modalHelpers";
+import {
+  closeModal,
+  confirmCancel,
+  handleCancel as reusableHandleCancel,
+} from "../../utils/modalHelpers";
 
 const EditEmployeeForm: React.FC = () => {
   const {
@@ -49,20 +53,15 @@ const EditEmployeeForm: React.FC = () => {
     }
   }, [employee, reset]);
 
+  const handleCancel = () =>
+    reusableHandleCancel(isDirty, setShowModal, navigate);
+
   const onSubmit = async (data: EmployeeFormData) => {
     try {
       await dispatch(updateEmployeeAction(id!, { id: employee?.id!, ...data }));
       navigate(`/employees`);
     } catch (error) {
       console.error("Error updating employee:", error);
-    }
-  };
-
-  const handleCancel = () => {
-    if (isDirty) {
-      setShowModal(true);
-    } else {
-      navigate(-1);
     }
   };
 

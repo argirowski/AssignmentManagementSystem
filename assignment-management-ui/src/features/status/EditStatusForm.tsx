@@ -14,7 +14,11 @@ import {
 import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
-import { closeModal, confirmCancel } from "../../utils/modalHelpers";
+import {
+  closeModal,
+  confirmCancel,
+  handleCancel as reusableHandleCancel,
+} from "../../utils/modalHelpers";
 
 const EditStatusForm: React.FC = () => {
   const {
@@ -50,6 +54,9 @@ const EditStatusForm: React.FC = () => {
     }
   }, [status, reset]);
 
+  const handleCancel = () =>
+    reusableHandleCancel(isDirty, setShowModal, navigate);
+
   const onSubmit = async (data: StatusFormData) => {
     try {
       await dispatch(
@@ -61,14 +68,6 @@ const EditStatusForm: React.FC = () => {
       navigate(`/statuses`);
     } catch (error) {
       console.error("Error updating status:", error);
-    }
-  };
-
-  const handleCancel = () => {
-    if (isDirty) {
-      setShowModal(true);
-    } else {
-      navigate(-1);
     }
   };
 
