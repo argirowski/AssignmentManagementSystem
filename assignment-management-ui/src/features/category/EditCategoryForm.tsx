@@ -10,11 +10,10 @@ import { categorySchema, CategoryFormData } from "../../utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
-import LoadingSpinner from "../../components/LoadingSpinner";
-import ErrorComponent from "../../components/ErrorComponent";
 import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
+import { closeModal, confirmCancel } from "../../utils/modalHelpers";
 
 const EditCategoryForm: React.FC = () => {
   const {
@@ -73,15 +72,6 @@ const EditCategoryForm: React.FC = () => {
     }
   };
 
-  const confirmCancel = () => {
-    setShowModal(false);
-    navigate(-1);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
   return (
     <WithLoadingAndError loading={loading} error={error}>
       {category ? (
@@ -130,8 +120,8 @@ const EditCategoryForm: React.FC = () => {
           </Card>
           <ConfirmCancelModal
             show={showModal}
-            onConfirm={confirmCancel}
-            onCancel={closeModal}
+            onConfirm={() => confirmCancel(setShowModal, navigate)}
+            onCancel={() => closeModal(setShowModal, () => {})}
           />
         </Container>
       ) : (

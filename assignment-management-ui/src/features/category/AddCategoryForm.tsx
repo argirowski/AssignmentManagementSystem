@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { categorySchema, CategoryFormData } from "../../utils/validation";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
+import { confirmCancel, closeModal } from "../../utils/modalHelpers";
 
 const AddCategoryForm: React.FC = () => {
   const {
@@ -26,15 +27,6 @@ const AddCategoryForm: React.FC = () => {
     } else {
       navigate(-1);
     }
-  };
-
-  const confirmCancel = () => {
-    setShowModal(false);
-    navigate(-1);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
   };
 
   const onSubmit = async (data: CategoryFormData) => {
@@ -94,8 +86,8 @@ const AddCategoryForm: React.FC = () => {
       </Card>
       <ConfirmCancelModal
         show={showModal}
-        onConfirm={confirmCancel}
-        onCancel={closeModal}
+        onConfirm={() => confirmCancel(setShowModal, navigate)}
+        onCancel={() => closeModal(setShowModal, () => {})}
       />
     </Container>
   );

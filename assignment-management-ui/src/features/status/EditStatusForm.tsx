@@ -14,6 +14,7 @@ import {
 import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
+import { closeModal, confirmCancel } from "../../utils/modalHelpers";
 
 const EditStatusForm: React.FC = () => {
   const {
@@ -71,15 +72,6 @@ const EditStatusForm: React.FC = () => {
     }
   };
 
-  const confirmCancel = () => {
-    setShowModal(false);
-    navigate(-1);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
   return (
     <WithLoadingAndError loading={loading} error={error}>
       {status ? (
@@ -128,8 +120,8 @@ const EditStatusForm: React.FC = () => {
           </Card>
           <ConfirmCancelModal
             show={showModal}
-            onConfirm={confirmCancel}
-            onCancel={closeModal}
+            onConfirm={() => confirmCancel(setShowModal, navigate)}
+            onCancel={() => closeModal(setShowModal, () => {})}
           />
         </Container>
       ) : (

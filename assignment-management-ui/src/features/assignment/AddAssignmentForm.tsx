@@ -13,6 +13,7 @@ import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
 import { fetchCategoriesAction } from "../../redux/category/categoryActions";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
+import { confirmCancel, closeModal } from "../../utils/modalHelpers";
 
 const AddAssignmentForm: React.FC = () => {
   const {
@@ -46,15 +47,6 @@ const AddAssignmentForm: React.FC = () => {
     } else {
       navigate(-1);
     }
-  };
-
-  const confirmCancel = () => {
-    setShowModal(false);
-    navigate(-1);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
   };
 
   const onSubmit = async (data: CreateAssignment) => {
@@ -227,8 +219,8 @@ const AddAssignmentForm: React.FC = () => {
       </Card>
       <ConfirmCancelModal
         show={showModal}
-        onConfirm={confirmCancel}
-        onCancel={closeModal}
+        onConfirm={() => confirmCancel(setShowModal, navigate)}
+        onCancel={() => closeModal(setShowModal, () => {})}
       />
     </Container>
   );

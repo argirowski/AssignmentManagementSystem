@@ -5,3 +5,11 @@ export const closeModal = (
   setShowModal(false);
   setItemToDelete(null);
 };
+
+export const confirmCancel = (
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>,
+  navigate: (path: number) => void
+) => {
+  setShowModal(false);
+  navigate(-1);
+};
