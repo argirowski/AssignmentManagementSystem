@@ -13,15 +13,14 @@ import ErrorComponent from "../components/ErrorComponent";
 
 const AssignmentsPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { assignments, loading, error } = useSelector(
     (state: AppState) => state.assignments
   );
-
   const [showModal, setShowModal] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(
     null
   );
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchAssignmentsAction());

@@ -23,7 +23,6 @@ const StatusesPage: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [statusToDelete, setStatusToDelete] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStatusesAction());
@@ -36,13 +35,11 @@ const StatusesPage: React.FC = () => {
 
   const confirmDelete = async () => {
     if (statusToDelete !== null) {
-      setDeleting(true);
       try {
         await dispatch(deleteStatusAction(statusToDelete));
       } catch (error) {
         console.error("Error deleting status:", error);
       } finally {
-        setDeleting(false);
         setShowModal(false);
         setStatusToDelete(null);
       }
@@ -54,7 +51,7 @@ const StatusesPage: React.FC = () => {
     setStatusToDelete(null);
   };
 
-  if (loading || deleting) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 

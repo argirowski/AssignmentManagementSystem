@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { addCategoryAction } from "../../redux/category/categoryActions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store";
 import { categorySchema, CategoryFormData } from "../../utils/validation";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
+import { useCommonHooks } from "../../hooks/useCommonHooks";
 
 const AddCategoryForm: React.FC = () => {
   const {
@@ -20,8 +18,7 @@ const AddCategoryForm: React.FC = () => {
   });
 
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
-  const dispatch: AppDispatch = useDispatch();
+  const { dispatch, navigate } = useCommonHooks();
 
   const handleCancel = () => {
     if (isDirty) {

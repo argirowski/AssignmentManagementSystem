@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Container, Card } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { fetchStatusesAction } from "../../redux/status/statusActions";
-import { AppState, AppDispatch } from "../../store";
+import { AppState } from "../../store";
 import { CreateAssignment } from "../../types/types";
 import { addAssignmentAction } from "../../redux/assignment/assignmentActions";
 import Select from "react-select";
@@ -13,6 +12,7 @@ import { assignmentSchema } from "../../utils/validation";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
 import { fetchCategoriesAction } from "../../redux/category/categoryActions";
+import { useCommonHooks } from "../../hooks/useCommonHooks";
 
 const AddAssignmentForm: React.FC = () => {
   const {
@@ -33,8 +33,7 @@ const AddAssignmentForm: React.FC = () => {
   });
 
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
-  const dispatch: AppDispatch = useDispatch();
+  const { dispatch, navigate } = useCommonHooks();
   const statuses = useSelector((state: AppState) => state.statuses.statuses);
   const employees = useSelector((state: AppState) => state.employees.employees);
   const categories = useSelector(

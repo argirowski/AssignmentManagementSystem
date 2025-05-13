@@ -23,7 +23,6 @@ const CategoriesPage: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCategoriesAction());
@@ -36,13 +35,11 @@ const CategoriesPage: React.FC = () => {
 
   const confirmDelete = async () => {
     if (categoryToDelete !== null) {
-      setDeleting(true);
       try {
         await dispatch(deleteCategoryAction(categoryToDelete));
       } catch (error) {
         console.error("Error deleting category:", error);
       } finally {
-        setDeleting(false);
         setShowModal(false);
         setCategoryToDelete(null);
       }
@@ -54,7 +51,7 @@ const CategoriesPage: React.FC = () => {
     setCategoryToDelete(null);
   };
 
-  if (loading || deleting) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 

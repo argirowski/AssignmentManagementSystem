@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store";
 import { addEmployeeAction } from "../../redux/employee/employeeActions";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { employeeSchema, EmployeeFormData } from "../../utils/validation";
+import { useCommonHooks } from "../../hooks/useCommonHooks";
 
 const AddEmployeeForm: React.FC = () => {
   const {
@@ -20,8 +18,7 @@ const AddEmployeeForm: React.FC = () => {
   });
 
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
-  const dispatch: AppDispatch = useDispatch();
+  const { dispatch, navigate } = useCommonHooks();
 
   const handleCancel = () => {
     if (isDirty) {

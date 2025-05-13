@@ -13,13 +13,12 @@ import ErrorComponent from "../components/ErrorComponent";
 
 const EmployeesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
   const { employees, loading, error } = useSelector(
     (state: AppState) => state.employees
   );
   const [showModal, setShowModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchEmployeesAction());
@@ -32,13 +31,11 @@ const EmployeesPage: React.FC = () => {
 
   const confirmDelete = async () => {
     if (employeeToDelete !== null) {
-      setDeleting(true);
       try {
         await dispatch(deleteEmployeeAction(employeeToDelete));
       } catch (error) {
         console.error("Error deleting employee:", error);
       } finally {
-        setDeleting(false);
         setShowModal(false);
         setEmployeeToDelete(null);
       }
@@ -50,7 +47,7 @@ const EmployeesPage: React.FC = () => {
     setEmployeeToDelete(null);
   };
 
-  if (loading || deleting) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
