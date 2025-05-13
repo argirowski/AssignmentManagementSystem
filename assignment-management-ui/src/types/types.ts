@@ -59,3 +59,13 @@ export type ConfirmDeleteModalProps = {
   onConfirm: () => void;
   onCancel: () => void;
 };
+
+export type NotFoundComponentProps = {
+  message: string;
+};
+
+export type WithLoadingAndErrorProps = {
+  loading: boolean;
+  error: string | null;
+  children: React.ReactNode;
+};

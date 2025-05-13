@@ -1,9 +1,6 @@
 import React from "react";
 import { Alert } from "react-bootstrap";
-
-type NotFoundComponentProps = {
-  message: string;
-};
+import { NotFoundComponentProps } from "../types/types";
 
 const NotFoundComponent: React.FC<NotFoundComponentProps> = ({ message }) => {
   return (

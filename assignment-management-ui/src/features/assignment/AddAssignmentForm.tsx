@@ -47,6 +47,7 @@ const AddAssignmentForm: React.FC = () => {
 
   const handleCancel = () =>
     reusableHandleCancel(isDirty, setShowModal, navigate);
+
   const onSubmit = async (data: CreateAssignment) => {
     try {
       await dispatch(addAssignmentAction(data));
