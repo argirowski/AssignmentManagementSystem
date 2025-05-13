@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
-import axios from "axios";
 import { CreateAssignment } from "../../types/types";
 import Select from "react-select";
 import { useForm } from "react-hook-form";
@@ -14,10 +13,14 @@ import {
 } from "../../utils/modalHelpers";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import { useSelector } from "react-redux";
+import {
+  fetchAssignmentByIdAction,
+  updateAssignmentAction,
+} from "../../redux/assignment/assignmentActions";
+import { AppState } from "../../store";
 import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
 import { fetchStatusesAction } from "../../redux/status/statusActions";
 import { fetchCategoriesAction } from "../../redux/category/categoryActions";
-import { AppState } from "../../store";
 
 const EditAssignmentForm: React.FC = () => {
   const {
@@ -30,6 +33,9 @@ const EditAssignmentForm: React.FC = () => {
   const statuses = useSelector((state: AppState) => state.statuses.statuses);
   const categories = useSelector(
     (state: AppState) => state.categories.categories
+  );
+  const assignment = useSelector(
+    (state: AppState) => state.assignments.assignmentDetails
   );
 
   const {
@@ -53,42 +59,38 @@ const EditAssignmentForm: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const fetchAssignment = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5088/api/Assignment/${id}`
-        );
-        const data = response.data;
-        reset({
-          title: data.title,
-          description: data.description,
-          isCompleted: data.isCompleted,
-          employeeId: data.employee.id,
-          statusId: data.status.id,
-          categoryIds: data.categories.map(
-            (category: { id: string }) => category.id
-          ),
-        });
-      } catch (error) {
-        console.error("Error fetching assignment details:", error);
-      }
-    };
+    if (id) {
+      dispatch(fetchAssignmentByIdAction(id));
+      dispatch(fetchEmployeesAction());
+      dispatch(fetchStatusesAction());
+      dispatch(fetchCategoriesAction());
+    }
+  }, [id, dispatch]);
 
-    fetchAssignment();
-    dispatch(fetchEmployeesAction());
-    dispatch(fetchStatusesAction());
-    dispatch(fetchCategoriesAction());
-  }, [id, reset, dispatch]);
+  useEffect(() => {
+    if (assignment) {
+      reset({
+        title: assignment.title,
+        description: assignment.description,
+        isCompleted: assignment.isCompleted,
+        employeeId: assignment.employee.fullName, // Use fullName from NewEmployee
+        statusId: assignment.status.description, // Use a valid property from StatusFormData
+        categoryIds: assignment.categories.map(
+          (category) => category.name // Use a valid property from NewCategory
+        ),
+      });
+    }
+  }, [assignment, reset]);
 
   const handleCancel = () =>
     reusableHandleCancel(isDirty, setShowModal, navigate);
 
   const onSubmit = async (data: CreateAssignment) => {
-    try {
-      await axios.put(`http://localhost:5088/api/Assignment/${id}`, data);
+    if (id) {
+      dispatch(updateAssignmentAction(id, data));
       navigate(`/assignments`);
-    } catch (error) {
-      console.error("Error updating assignment:", error);
+    } else {
+      console.error("Assignment ID is missing.");
     }
   };
 
@@ -120,6 +122,24 @@ const EditAssignmentForm: React.FC = () => {
         shouldValidate: true,
         shouldDirty: true,
       });
+    }
+  };
+
+  const handleEmployeeDropdownClick = () => {
+    if (employees.length === 0) {
+      dispatch(fetchEmployeesAction());
+    }
+  };
+
+  const handleStatusDropdownClick = () => {
+    if (statuses.length === 0) {
+      dispatch(fetchStatusesAction());
+    }
+  };
+
+  const handleCategoryDropdownOpen = () => {
+    if (categories.length === 0) {
+      dispatch(fetchCategoriesAction());
     }
   };
 
@@ -172,6 +192,7 @@ const EditAssignmentForm: React.FC = () => {
                 isMulti
                 options={categoryOptions}
                 onChange={onCategoryChange}
+                onMenuOpen={handleCategoryDropdownOpen} // Trigger fetch on menu open
                 placeholder="Select categories..."
               />
               {errors.categoryIds && (
@@ -188,6 +209,7 @@ const EditAssignmentForm: React.FC = () => {
                 {...register("employeeId")}
                 isInvalid={!!errors.employeeId}
                 onChange={onEmployeeChange}
+                onClick={handleEmployeeDropdownClick} // Trigger fetch on click
               >
                 <option value="">Select an employee</option>
                 {employees.map((employee) => (
@@ -208,6 +230,7 @@ const EditAssignmentForm: React.FC = () => {
                 {...register("statusId")}
                 isInvalid={!!errors.statusId}
                 onChange={onStatusChange}
+                onClick={handleStatusDropdownClick} // Trigger fetch on click
               >
                 <option value="">Select a status</option>
                 {statuses.map((status) => (

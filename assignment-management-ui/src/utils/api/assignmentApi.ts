@@ -44,3 +44,15 @@ export const apiAddAssignment = async (
     throw error;
   }
 };
+
+export const apiUpdateAssignment = async (
+  id: string,
+  assignmentData: CreateAssignment
+): Promise<void> => {
+  try {
+    await axios.put(`${API_BASE_URL}/Assignment/${id}`, assignmentData);
+  } catch (error) {
+    console.error("Error updating assignment:", error);
+    throw error;
+  }
+};

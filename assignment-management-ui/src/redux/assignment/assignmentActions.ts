@@ -24,6 +24,7 @@ import {
   apiAddAssignment,
   apiDeleteAssignment,
   apiFetchAssignmentById,
+  apiUpdateAssignment,
 } from "../../utils/api/assignmentApi";
 import { Assignment, CreateAssignment } from "../../types/types";
 
@@ -85,6 +86,21 @@ export const fetchAssignmentByIdAction = (
         type: FETCH_ASSIGNMENT_BY_ID_FAILURE,
         payload: error.message,
       });
+    }
+  };
+};
+
+export const updateAssignmentAction = (
+  id: string,
+  assignmentData: CreateAssignment
+): ThunkAction<void, AppState, unknown, AnyAction> => {
+  return async (dispatch: Dispatch) => {
+    dispatch({ type: UPDATE_ASSIGNMENT_REQUEST });
+    try {
+      await apiUpdateAssignment(id, assignmentData);
+      dispatch({ type: UPDATE_ASSIGNMENT_SUCCESS });
+    } catch (error: any) {
+      dispatch({ type: UPDATE_ASSIGNMENT_FAILURE, payload: error.message });
     }
   };
 };
