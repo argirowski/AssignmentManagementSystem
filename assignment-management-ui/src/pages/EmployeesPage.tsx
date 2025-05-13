@@ -8,8 +8,7 @@ import {
   deleteEmployeeAction,
 } from "../redux/employee/employeeActions";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
-import LoadingSpinner from "../components/LoadingSpinner";
-import ErrorComponent from "../components/ErrorComponent";
+import WithLoadingAndError from "../components/WithLoadingAndError";
 
 const EmployeesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -47,68 +46,62 @@ const EmployeesPage: React.FC = () => {
     setEmployeeToDelete(null);
   };
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
-    return <ErrorComponent message={error} />;
-  }
-
   return (
-    <Container>
-      <div className="employee-list">
-        <h2>Employees</h2>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Full Name</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map(({ id, fullName, email }) => (
-              <tr key={id}>
-                <td>{fullName}</td>
-                <td>{email}</td>
-                <td>
-                  <Button
-                    variant="success me-2"
-                    onClick={() => navigate(`/employees/${id}`)}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="warning me-2"
-                    onClick={() => navigate(`/employees/${id}/edit`)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger me-2"
-                    onClick={() => handleDelete(id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
+    <WithLoadingAndError loading={loading} error={error}>
+      <Container>
+        <div className="employee-list">
+          <h2>Employees</h2>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-        <div className="mt-4 text-start">
-          <p>
-            Want to add a new employee?{" "}
-            <Link to="/employees/new">Click here</Link>
-          </p>
+            </thead>
+            <tbody>
+              {employees.map(({ id, fullName, email }) => (
+                <tr key={id}>
+                  <td>{fullName}</td>
+                  <td>{email}</td>
+                  <td>
+                    <Button
+                      variant="success me-2"
+                      onClick={() => navigate(`/employees/${id}`)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      variant="warning me-2"
+                      onClick={() => navigate(`/employees/${id}/edit`)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger me-2"
+                      onClick={() => handleDelete(id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <div className="mt-4 text-start">
+            <p>
+              Want to add a new employee?{" "}
+              <Link to="/employees/new">Click here</Link>
+            </p>
+          </div>
         </div>
-      </div>
-      <ConfirmDeleteModal
-        show={showModal}
-        onConfirm={confirmDelete}
-        onCancel={closeModal}
-      />
-    </Container>
+        <ConfirmDeleteModal
+          show={showModal}
+          onConfirm={confirmDelete}
+          onCancel={closeModal}
+        />
+      </Container>
+    </WithLoadingAndError>
   );
 };
 

@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Button, Table, Container } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import { AppState, AppDispatch } from "../store";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
-import LoadingSpinner from "../components/LoadingSpinner";
 import { Status } from "../types/types";
 import {
   fetchStatusesAction,
   deleteStatusAction,
 } from "../redux/status/statusActions";
-import ErrorComponent from "../components/ErrorComponent";
+import WithLoadingAndError from "../components/WithLoadingAndError";
 const StatusesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,65 +49,60 @@ const StatusesPage: React.FC = () => {
     setStatusToDelete(null);
   };
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (error) {
-    return <ErrorComponent message={error} />;
-  }
-
   return (
-    <Container>
-      <div className="statuses">
-        <h2>Statuses</h2>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {typedStatuses.map(({ id, description }) => (
-              <tr key={id}>
-                <td>{description}</td>
-                <td>
-                  <Button
-                    variant="success me-2"
-                    onClick={() => navigate(`/statuses/${id}`)}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="warning me-2"
-                    onClick={() => navigate(`/statuses/${id}/edit`)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger me-2"
-                    onClick={() => handleDelete(id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
+    <WithLoadingAndError loading={loading} error={error}>
+      <Container>
+        <div className="statuses">
+          <h2>Statuses</h2>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-        <div className="mt-4 text-start">
-          <p>
-            Want to add a new status? <Link to="/statuses/new">Click here</Link>
-          </p>
+            </thead>
+            <tbody>
+              {typedStatuses.map(({ id, description }) => (
+                <tr key={id}>
+                  <td>{description}</td>
+                  <td>
+                    <Button
+                      variant="success me-2"
+                      onClick={() => navigate(`/statuses/${id}`)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      variant="warning me-2"
+                      onClick={() => navigate(`/statuses/${id}/edit`)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger me-2"
+                      onClick={() => handleDelete(id)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <div className="mt-4 text-start">
+            <p>
+              Want to add a new status?{" "}
+              <Link to="/statuses/new">Click here</Link>
+            </p>
+          </div>
         </div>
-      </div>
-      <ConfirmDeleteModal
-        show={showModal}
-        onConfirm={confirmDelete}
-        onCancel={closeModal}
-      />
-    </Container>
+        <ConfirmDeleteModal
+          show={showModal}
+          onConfirm={confirmDelete}
+          onCancel={closeModal}
+        />
+      </Container>
+    </WithLoadingAndError>
   );
 };
 
