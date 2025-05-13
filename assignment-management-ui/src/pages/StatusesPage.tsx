@@ -10,6 +10,8 @@ import {
   deleteStatusAction,
 } from "../redux/status/statusActions";
 import WithLoadingAndError from "../components/WithLoadingAndError";
+import { closeModal } from "../utils/modalHelpers";
+
 const StatusesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,11 +44,6 @@ const StatusesPage: React.FC = () => {
         setStatusToDelete(null);
       }
     }
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setStatusToDelete(null);
   };
 
   return (
@@ -99,7 +96,7 @@ const StatusesPage: React.FC = () => {
         <ConfirmDeleteModal
           show={showModal}
           onConfirm={confirmDelete}
-          onCancel={closeModal}
+          onCancel={() => closeModal(setShowModal, setStatusToDelete)}
         />
       </Container>
     </WithLoadingAndError>

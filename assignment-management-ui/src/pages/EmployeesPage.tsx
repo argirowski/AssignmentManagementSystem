@@ -9,6 +9,7 @@ import {
 } from "../redux/employee/employeeActions";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import WithLoadingAndError from "../components/WithLoadingAndError";
+import { closeModal } from "../utils/modalHelpers";
 
 const EmployeesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -39,11 +40,6 @@ const EmployeesPage: React.FC = () => {
         setEmployeeToDelete(null);
       }
     }
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setEmployeeToDelete(null);
   };
 
   return (
@@ -98,7 +94,7 @@ const EmployeesPage: React.FC = () => {
         <ConfirmDeleteModal
           show={showModal}
           onConfirm={confirmDelete}
-          onCancel={closeModal}
+          onCancel={() => closeModal(setShowModal, setEmployeeToDelete)}
         />
       </Container>
     </WithLoadingAndError>

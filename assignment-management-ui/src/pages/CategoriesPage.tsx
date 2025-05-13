@@ -10,6 +10,7 @@ import {
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { AppState, AppDispatch } from "../store";
 import WithLoadingAndError from "../components/WithLoadingAndError";
+import { closeModal } from "../utils/modalHelpers";
 
 const CategoriesPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
@@ -43,11 +44,6 @@ const CategoriesPage: React.FC = () => {
         setCategoryToDelete(null);
       }
     }
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setCategoryToDelete(null);
   };
 
   return (
@@ -100,7 +96,7 @@ const CategoriesPage: React.FC = () => {
         <ConfirmDeleteModal
           show={showModal}
           onConfirm={confirmDelete}
-          onCancel={closeModal}
+          onCancel={() => closeModal(setShowModal, setCategoryToDelete)}
         />
       </Container>
     </WithLoadingAndError>

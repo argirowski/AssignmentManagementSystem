@@ -9,6 +9,7 @@ import {
 import { AppState, AppDispatch } from "../store";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import WithLoadingAndError from "../components/WithLoadingAndError";
+import { closeModal } from "../utils/modalHelpers";
 
 const AssignmentsPage: React.FC = () => {
   const dispatch: AppDispatch = useDispatch<AppDispatch>();
@@ -36,11 +37,6 @@ const AssignmentsPage: React.FC = () => {
       setShowModal(false);
       setAssignmentToDelete(null);
     }
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setAssignmentToDelete(null);
   };
 
   return (
@@ -115,7 +111,7 @@ const AssignmentsPage: React.FC = () => {
         <ConfirmDeleteModal
           show={showModal}
           onConfirm={confirmDelete}
-          onCancel={closeModal}
+          onCancel={() => closeModal(setShowModal, setAssignmentToDelete)}
         />
       </Container>
     </WithLoadingAndError>
