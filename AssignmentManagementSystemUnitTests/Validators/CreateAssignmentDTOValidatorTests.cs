@@ -36,6 +36,7 @@ public class CreateAssignmentDTOValidatorTests
         // Arrange
         var createAssignment = new CreateAssignmentDTO
         {
+            Title = string.Empty,
             Description = "Test Description",
             EmployeeId = Guid.NewGuid(),
             StatusId = Guid.NewGuid(),

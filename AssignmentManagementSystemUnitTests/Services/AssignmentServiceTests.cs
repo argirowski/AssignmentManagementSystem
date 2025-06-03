@@ -21,8 +21,45 @@ public class AssignmentServiceTests
     public async Task GetAllAsync_ReturnsListOfAssignments()
     {
         // Arrange
-        var assignments = new List<Assignment> { new Assignment { Id = Guid.NewGuid(), Title = "Test Assignment", Description = "Test Description" } };
-        var assignmentDTOs = new List<AssignmentDTO> { new AssignmentDTO { Id = assignments[0].Id, Title = assignments[0].Title, Description = assignments[0].Description } };
+        var assignments = new List<Assignment>
+        {
+            new Assignment
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test Assignment",
+                Description = "Test Description",
+                Employee = new Employee { Id = Guid.NewGuid(), FullName = "John Doe", Email = "johndoe@example.com" },
+                Status = new Status { Id = Guid.NewGuid(), Description = "In Progress" },
+                AssignmentCategories = new List<AssignmentCategory>
+                {
+                    new AssignmentCategory { Category = new Category { Id = Guid.NewGuid(), Name = "Category1" } }
+                }
+            }
+        };
+
+        var assignmentDTOs = new List<AssignmentDTO>
+        {
+            new()
+            {
+                Id = assignments[0].Id,
+                Title = assignments[0].Title,
+                Description = assignments[0].Description,
+                Employee = new EmployeeDTO
+                {
+                    Id = assignments[0].Employee.Id,
+                    FullName = assignments[0].Employee.FullName,
+                    Email = assignments[0].Employee.Email
+                },
+                Status = new StatusDTO
+                {
+                    Id = assignments[0].Status.Id,
+                    Description = assignments[0].Status.Description
+                },
+                Categories = assignments[0].AssignmentCategories
+                    .Select(ac => new CategoryDTO { Id = ac.Category.Id, Name = ac.Category.Name })
+                    .ToList()
+            }
+        };
 
         _mockUnitOfWork.Setup(u => u.Assignments.GetAllAsync()).ReturnsAsync(assignments);
         _mockMapper.Setup(m => m.Map<IEnumerable<AssignmentDTO>>(assignments)).Returns(assignmentDTOs);
@@ -38,8 +75,39 @@ public class AssignmentServiceTests
     public async Task GetByIdAsync_ValidId_ReturnsAssignment()
     {
         // Arrange
-        var assignment = new Assignment { Id = Guid.NewGuid(), Title = "Test Assignment", Description = "Test Description" };
-        var assignmentDTO = new AssignmentDTO { Id = assignment.Id, Title = assignment.Title, Description = assignment.Description };
+        var assignment = new Assignment
+        {
+            Id = Guid.NewGuid(),
+            Title = "Test Assignment",
+            Description = "Test Description",
+            Employee = new Employee { Id = Guid.NewGuid(), FullName = "John Doe", Email = "johndoe@example.com" },
+            Status = new Status { Id = Guid.NewGuid(), Description = "In Progress" },
+            AssignmentCategories = new List<AssignmentCategory>
+            {
+                new AssignmentCategory { Category = new Category { Id = Guid.NewGuid(), Name = "Category1" } }
+            }
+        };
+
+        var assignmentDTO = new AssignmentDTO
+        {
+            Id = assignment.Id,
+            Title = assignment.Title,
+            Description = assignment.Description,
+            Employee = new EmployeeDTO
+            {
+                Id = assignment.Employee.Id,
+                FullName = assignment.Employee.FullName,
+                Email = assignment.Employee.Email
+            },
+            Status = new StatusDTO
+            {
+                Id = assignment.Status.Id,
+                Description = assignment.Status.Description
+            },
+            Categories = assignment.AssignmentCategories
+                .Select(ac => new CategoryDTO { Id = ac.Category.Id, Name = ac.Category.Name })
+                .ToList()
+        };
 
         _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
         _mockMapper.Setup(m => m.Map<AssignmentDTO>(assignment)).Returns(assignmentDTO);
@@ -65,11 +133,34 @@ public class AssignmentServiceTests
     public async Task CreateAsync_ValidData_ReturnsCreatedAssignment()
     {
         // Arrange
-        var createDto = new CreateAssignmentDTO { Title = "New Assignment", EmployeeId = Guid.NewGuid(), StatusId = Guid.NewGuid(), CategoryIds = new List<Guid>() };
+        var createDto = new CreateAssignmentDTO
+        {
+            Title = "New Assignment",
+            Description = "Default Description",
+            EmployeeId = Guid.NewGuid(),
+            StatusId = Guid.NewGuid(),
+            CategoryIds = new()
+        };
         var employee = new Employee { Id = createDto.EmployeeId, FullName = "John Doe", Email = "johndoe@example.com" };
         var status = new Status { Id = createDto.StatusId, Description = "In Progress" };
-        var assignment = new Assignment { Id = Guid.NewGuid(), Title = createDto.Title, Description = "Default Description", Employee = employee, Status = status };
-        var assignmentDTO = new AssignmentDTO { Id = assignment.Id, Title = assignment.Title, Description = assignment.Description };
+        var categories = new List<CategoryDTO> { new CategoryDTO { Id = Guid.NewGuid(), Name = "Category1" } }; // Mock categories
+        var assignment = new Assignment
+        {
+            Id = Guid.NewGuid(),
+            Title = createDto.Title,
+            Description = createDto.Description,
+            Employee = employee,
+            Status = status
+        };
+        var assignmentDTO = new AssignmentDTO
+        {
+            Id = assignment.Id,
+            Title = assignment.Title,
+            Description = assignment.Description,
+            Employee = new EmployeeDTO { Id = employee.Id, FullName = employee.FullName, Email = employee.Email },
+            Status = new StatusDTO { Id = status.Id, Description = status.Description },
+            Categories = categories
+        };
 
         _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(createDto.EmployeeId)).ReturnsAsync(employee);
         _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(createDto.StatusId)).ReturnsAsync(status);
@@ -88,7 +179,14 @@ public class AssignmentServiceTests
     public async Task CreateAsync_InvalidEmployee_ThrowsArgumentException()
     {
         // Arrange
-        var createDto = new CreateAssignmentDTO { Title = "New Assignment", EmployeeId = Guid.NewGuid(), StatusId = Guid.NewGuid(), CategoryIds = new List<Guid>() };
+        var createDto = new CreateAssignmentDTO
+        {
+            Title = "New Assignment",
+            Description = "Default Description",
+            EmployeeId = Guid.NewGuid(),
+            StatusId = Guid.NewGuid(),
+            CategoryIds = new()
+        };
         _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(createDto.EmployeeId)).ReturnsAsync((Employee)null);
 
         // Act & Assert
