@@ -16,21 +16,21 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<StatusDTO>>> GetAll()
         {
             var statuses = await _statusService.GetAllStatusesAsync();
             return Ok(statuses);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<ActionResult<StatusDTO>> GetById(Guid id)
         {
             var status = await _statusService.GetStatusByIdAsync(id);
             return Ok(status);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateStatusDTO createStatusDTO)
+        public async Task<ActionResult<string>> Create(CreateStatusDTO createStatusDTO)
         {
             await _statusService.CreateStatusAsync(createStatusDTO);
             return Ok(new { createStatusDTO.Description });
@@ -39,6 +39,8 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, StatusDTO statusDTO)
         {
+            // Ensure the ID in the DTO matches the ID in the route
+            statusDTO.Id = id;
             await _statusService.UpdateStatusAsync(id, statusDTO);
             return NoContent();
         }

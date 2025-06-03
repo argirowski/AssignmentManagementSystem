@@ -19,7 +19,7 @@ namespace Persistence.Repositories
             return await _connection.QueryAsync<Employee>(query);
         }
 
-        public async Task<Employee> GetByIdAsync(Guid id)
+        public async Task<Employee?> GetByIdAsync(Guid id)
         {
             const string query = "SELECT * FROM Employees WHERE Id = @Id";
             return await _connection.QuerySingleOrDefaultAsync<Employee>(query, new { Id = id });
@@ -31,16 +31,16 @@ namespace Persistence.Repositories
             await _connection.ExecuteAsync(query, employee);
         }
 
-        public void Update(Employee employee)
+        public async Task UpdateAsync(Employee employee)
         {
             const string query = "UPDATE Employees SET FullName = @FullName, Email = @Email, DateJoined = @DateJoined WHERE Id = @Id";
-            _connection.Execute(query, employee);
+            await _connection.ExecuteAsync(query, employee);
         }
 
-        public void Remove(Employee employee)
+        public async Task RemoveAsync(Employee employee)
         {
             const string query = "DELETE FROM Employees WHERE Id = @Id";
-            _connection.Execute(query, new { employee.Id });
+            await _connection.ExecuteAsync(query, new { employee.Id });
         }
 
         public async Task<bool> IsEmployeeLinkedToAssignmentsAsync(Guid employeeId)

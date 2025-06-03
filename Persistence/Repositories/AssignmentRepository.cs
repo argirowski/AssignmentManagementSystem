@@ -60,7 +60,7 @@ public class AssignmentRepository : IAssignmentRepository
         return assignmentDictionary.Values;
     }
 
-    public async Task<Assignment> GetByIdAsync(Guid id)
+    public async Task<Assignment?> GetByIdAsync(Guid id)
     {
         const string query = @"SELECT a.Id, a.Title, a.Description, a.IsCompleted, a.CreatedAt, a.EmployeeId, a.StatusId, 
                           e.Id, e.FullName, e.Email, 
@@ -147,7 +147,7 @@ public class AssignmentRepository : IAssignmentRepository
         }
     }
 
-    public void Update(Assignment assignment)
+    public async Task UpdateAsync(Assignment assignment)
     {
         const string updateAssignmentQuery = "UPDATE Assignments SET Title = @Title, Description = @Description, EmployeeId = @EmployeeId, StatusId = @StatusId, IsCompleted = @IsCompleted WHERE Id = @Id";
         const string deleteAssignmentCategoriesQuery = "DELETE FROM AssignmentCategories WHERE AssignmentId = @Id";
@@ -157,8 +157,7 @@ public class AssignmentRepository : IAssignmentRepository
         {
             try
             {
-                // Update the Assignment
-                _dbConnection.Execute(updateAssignmentQuery, new
+                await _dbConnection.ExecuteAsync(updateAssignmentQuery, new
                 {
                     assignment.Id,
                     assignment.Title,
@@ -168,13 +167,11 @@ public class AssignmentRepository : IAssignmentRepository
                     assignment.IsCompleted
                 }, transaction);
 
-                // Delete existing AssignmentCategories
-                _dbConnection.Execute(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
+                await _dbConnection.ExecuteAsync(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
 
-                // Insert updated AssignmentCategories
                 foreach (var category in assignment.AssignmentCategories)
                 {
-                    _dbConnection.Execute(insertAssignmentCategoriesQuery, new
+                    await _dbConnection.ExecuteAsync(insertAssignmentCategoriesQuery, new
                     {
                         AssignmentId = assignment.Id,
                         CategoryId = category.CategoryId
@@ -191,7 +188,7 @@ public class AssignmentRepository : IAssignmentRepository
         }
     }
 
-    public void Remove(Assignment assignment)
+    public async Task RemoveAsync(Assignment assignment)
     {
         const string deleteAssignmentCategoriesQuery = "DELETE FROM AssignmentCategories WHERE AssignmentId = @Id";
         const string deleteAssignmentQuery = "DELETE FROM Assignments WHERE Id = @Id";
@@ -200,12 +197,8 @@ public class AssignmentRepository : IAssignmentRepository
         {
             try
             {
-                // Delete related AssignmentCategories
-                _dbConnection.Execute(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
-
-                // Delete the Assignment
-                _dbConnection.Execute(deleteAssignmentQuery, new { assignment.Id }, transaction);
-
+                await _dbConnection.ExecuteAsync(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
+                await _dbConnection.ExecuteAsync(deleteAssignmentQuery, new { assignment.Id }, transaction);
                 transaction.Commit();
             }
             catch

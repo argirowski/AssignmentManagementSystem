@@ -13,29 +13,31 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetAll()
     {
         var employees = await _employeeService.GetAllEmployeesAsync();
         return Ok(employees);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<ActionResult<EmployeeDTO>> GetById(Guid id)
     {
         var employee = await _employeeService.GetEmployeeByIdAsync(id);
         return Ok(employee);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateEmployeeDTO createEmployeeDTO)
+    public async Task<ActionResult<EmployeeDTO>> Create(CreateEmployeeDTO createEmployeeDTO)
     {
         var createdEmployee = await _employeeService.CreateEmployeeAsync(createEmployeeDTO);
         return CreatedAtAction(nameof(GetById), new { id = createdEmployee.Id }, createdEmployee);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, EmployeeDTO employeeDTO)
+    public async Task<ActionResult<EmployeeDTO>> Update(Guid id, EmployeeDTO employeeDTO)
     {
+        // Ensure the ID in the DTO matches the ID in the route
+        employeeDTO.Id = id;
         var updatedEmployee = await _employeeService.UpdateEmployeeAsync(id, employeeDTO);
         return Ok(updatedEmployee);
     }

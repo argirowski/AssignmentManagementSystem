@@ -27,16 +27,16 @@ namespace Persistence.UnitOfWork
         public IEmployeeRepository Employees => _employeeRepository ??= new EmployeeRepository(_dbConnection);
         public IAssignmentRepository Assignments => _assignmentRepository ??= new AssignmentRepository(_dbConnection);
 
-        public async Task<int> CompleteAsync()
+        public Task<int> CompleteAsync()
         {
             // Assuming the use of a transaction, commit it here.
             if (_dbConnection.State == ConnectionState.Open)
             {
                 // Commit transaction logic if applicable
-                return 1; // Return a dummy value for now
+                return Task.FromResult(1); // Return a dummy value for now
             }
 
-            return 0;
+            return Task.FromResult(0);
         }
 
         public void Dispose()

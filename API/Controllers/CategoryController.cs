@@ -16,21 +16,21 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAll()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
             return Ok(categories);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<ActionResult<CategoryDTO>> GetById(Guid id)
         {
             var category = await _categoryService.GetCategoryByIdAsync(id);
             return Ok(category);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCategoryDTO createCategoryDTO)
+        public async Task<ActionResult<string>> Create(CreateCategoryDTO createCategoryDTO)
         {
             await _categoryService.CreateCategoryAsync(createCategoryDTO);
             return Ok(new { createCategoryDTO.Name });
@@ -39,6 +39,8 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, CategoryDTO categoryDTO)
         {
+            // Ensure the ID in the DTO matches the ID in the route
+            categoryDTO.Id = id;
             await _categoryService.UpdateCategoryAsync(id, categoryDTO);
             return NoContent();
         }

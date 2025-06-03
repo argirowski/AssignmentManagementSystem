@@ -124,9 +124,8 @@ public class AssignmentService : IAssignmentService
         }).ToList();
         assignment.IsCompleted = updateAssignmentDTO.IsCompleted;
 
-        _unitOfWork.Assignments.Update(assignment);
+        await _unitOfWork.Assignments.UpdateAsync(assignment);
         await _unitOfWork.CompleteAsync();
-
         return _mapper.Map<AssignmentDTO>(assignment);
     }
 
@@ -138,7 +137,7 @@ public class AssignmentService : IAssignmentService
             throw new KeyNotFoundException("The Assignment you are trying to delete does not exist.");
         }
 
-        _unitOfWork.Assignments.Remove(assignment);
+        await _unitOfWork.Assignments.RemoveAsync(assignment);
         await _unitOfWork.CompleteAsync();
     }
 }

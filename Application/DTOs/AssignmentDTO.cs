@@ -8,9 +8,9 @@ namespace Application.DTOs
         public bool IsCompleted { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        public EmployeeDTO Employee { get; set; }
-        public StatusDTO Status { get; set; }
-        public List<CategoryDTO> Categories { get; set; } = new List<CategoryDTO>();
+        public required EmployeeDTO Employee { get; set; }
+        public required StatusDTO Status { get; set; }
+        public required List<CategoryDTO> Categories { get; set; }
 
     }
 }

@@ -65,7 +65,7 @@ public class EmployeeService : IEmployeeService
         }
 
         _mapper.Map(employeeDto, employee);
-        _unitOfWork.Employees.Update(employee);
+        await _unitOfWork.Employees.UpdateAsync(employee);
         await _unitOfWork.CompleteAsync();
         return _mapper.Map<EmployeeDTO>(employee);
     }
@@ -82,7 +82,7 @@ public class EmployeeService : IEmployeeService
             throw new KeyNotFoundException("The Employee you are trying to delete does not exist.");
         }
 
-        _unitOfWork.Employees.Remove(employee);
+        await _unitOfWork.Employees.RemoveAsync(employee);
         await _unitOfWork.CompleteAsync();
     }
 }
