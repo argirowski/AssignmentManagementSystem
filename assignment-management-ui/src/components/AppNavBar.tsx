@@ -2,7 +2,7 @@ import React from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-const AppNavbar: React.FC = () => {
+const AppNavBar: React.FC = () => {
   return (
     <Navbar bg="danger" variant="dark" expand="lg">
       <Container>
@@ -31,4 +31,4 @@ const AppNavbar: React.FC = () => {
   );
 };
 
-export default AppNavbar;
+export default AppNavBar;
