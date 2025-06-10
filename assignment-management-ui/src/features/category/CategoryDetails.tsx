@@ -26,8 +26,13 @@ const CategoryDetails: React.FC = () => {
   }, [dispatch, id]);
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {category ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!category}
+      notFoundMessage="Category not found."
+    >
+      {category && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -61,8 +66,6 @@ const CategoryDetails: React.FC = () => {
             </Button>
           </div>
         </Container>
-      ) : (
-        <NotFoundComponent message="Category not found." />
       )}
     </WithLoadingAndError>
   );

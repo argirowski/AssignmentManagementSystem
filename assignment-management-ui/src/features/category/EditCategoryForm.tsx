@@ -72,8 +72,13 @@ const EditCategoryForm: React.FC = () => {
   };
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {category ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!category}
+      notFoundMessage="Category not found."
+    >
+      {category && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -123,8 +128,6 @@ const EditCategoryForm: React.FC = () => {
             onCancel={() => closeModal(setShowModal, () => {})}
           />
         </Container>
-      ) : (
-        <NotFoundComponent message="Category not found." />
       )}
     </WithLoadingAndError>
   );

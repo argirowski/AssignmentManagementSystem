@@ -10,7 +10,6 @@ import {
 } from "../../redux/employee/employeeActions";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
 import { employeeSchema, EmployeeFormData } from "../../utils/validation";
-import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 import {
@@ -66,8 +65,13 @@ const EditEmployeeForm: React.FC = () => {
   };
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {employee ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!employee}
+      notFoundMessage="Employee not found."
+    >
+      {employee && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -132,8 +136,6 @@ const EditEmployeeForm: React.FC = () => {
             onCancel={() => closeModal(setShowModal, () => {})}
           />
         </Container>
-      ) : (
-        <NotFoundComponent message="Employee not found." />
       )}
     </WithLoadingAndError>
   );

@@ -21,6 +21,7 @@ import { AppState } from "../../store";
 import { fetchEmployeesAction } from "../../redux/employee/employeeActions";
 import { fetchStatusesAction } from "../../redux/status/statusActions";
 import { fetchCategoriesAction } from "../../redux/category/categoryActions";
+import WithLoadingAndError from "../../components/WithLoadingAndError";
 
 const EditAssignmentForm: React.FC = () => {
   const {
@@ -34,9 +35,12 @@ const EditAssignmentForm: React.FC = () => {
   const categories = useSelector(
     (state: AppState) => state.categories.categories
   );
-  const assignment = useSelector(
-    (state: AppState) => state.assignments.assignmentDetails
-  );
+
+  const {
+    assignmentDetails: assignment,
+    loading,
+    error,
+  } = useSelector((state: AppState) => state.assignments);
 
   const {
     register,
@@ -144,136 +148,148 @@ const EditAssignmentForm: React.FC = () => {
   };
 
   return (
-    <Container
-      style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!assignment}
+      notFoundMessage="Assignment not found."
     >
-      <Card className="mt-4">
-        <Card.Body>
-          <h2 className="text-start">Edit Assignment</h2>
-          <Form className="mt-4 text-start" onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group controlId="formTitle" className="mb-3">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter assignment title"
-                {...register("title")}
-                isInvalid={!!errors.title}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.title?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
+      {assignment && (
+        <Container
+          style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
+        >
+          <Card className="mt-4">
+            <Card.Body>
+              <h2 className="text-start">Edit Assignment</h2>
+              <Form
+                className="mt-4 text-start"
+                onSubmit={handleSubmit(onSubmit)}
+              >
+                <Form.Group controlId="formTitle" className="mb-3">
+                  <Form.Label>Title</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter assignment title"
+                    {...register("title")}
+                    isInvalid={!!errors.title}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.title?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formDescription" className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Enter assignment description"
-                {...register("description")}
-                isInvalid={!!errors.description}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.description?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formDescription" className="mb-3">
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Enter assignment description"
+                    {...register("description")}
+                    isInvalid={!!errors.description}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.description?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formIsCompleted" className="mb-3">
-              <Form.Check
-                type="checkbox"
-                label="Completed"
-                {...register("isCompleted")}
-              />
-            </Form.Group>
+                <Form.Group controlId="formIsCompleted" className="mb-3">
+                  <Form.Check
+                    type="checkbox"
+                    label="Completed"
+                    {...register("isCompleted")}
+                  />
+                </Form.Group>
 
-            <Form.Group controlId="formCategory" className="mb-3">
-              <Form.Label>Categories</Form.Label>
-              <Select
-                isMulti
-                options={categoryOptions}
-                onChange={onCategoryChange}
-                onMenuOpen={handleCategoryDropdownOpen} // Trigger fetch on menu open
-                placeholder="Select categories..."
-              />
-              {errors.categoryIds && (
-                <div className="invalid-feedback d-block">
-                  {errors.categoryIds.message}
+                <Form.Group controlId="formCategory" className="mb-3">
+                  <Form.Label>Categories</Form.Label>
+                  <Select
+                    isMulti
+                    options={categoryOptions}
+                    onChange={onCategoryChange}
+                    onMenuOpen={handleCategoryDropdownOpen} // Trigger fetch on menu open
+                    placeholder="Select categories..."
+                  />
+                  {errors.categoryIds && (
+                    <div className="invalid-feedback d-block">
+                      {errors.categoryIds.message}
+                    </div>
+                  )}
+                </Form.Group>
+
+                <Form.Group controlId="formEmployee" className="mb-3">
+                  <Form.Label>Employee</Form.Label>
+                  <Form.Control
+                    as="select"
+                    {...register("employeeId")}
+                    isInvalid={!!errors.employeeId}
+                    onChange={onEmployeeChange}
+                    onClick={handleEmployeeDropdownClick} // Trigger fetch on click
+                  >
+                    <option value="">Select an employee</option>
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {employee.fullName}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.employeeId?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="formStatus" className="mb-3">
+                  <Form.Label>Status</Form.Label>
+                  <Form.Control
+                    as="select"
+                    {...register("statusId")}
+                    isInvalid={!!errors.statusId}
+                    onChange={onStatusChange}
+                    onClick={handleStatusDropdownClick} // Trigger fetch on click
+                  >
+                    <option value="">Select a status</option>
+                    {statuses.map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.description}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.statusId?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <div
+                  className="d-flex justify-content-start mt-2"
+                  style={{ gap: "1rem" }}
+                >
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    size="lg"
+                    style={{ maxWidth: "10rem" }}
+                  >
+                    Submit
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    style={{ maxWidth: "10rem" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
                 </div>
-              )}
-            </Form.Group>
-
-            <Form.Group controlId="formEmployee" className="mb-3">
-              <Form.Label>Employee</Form.Label>
-              <Form.Control
-                as="select"
-                {...register("employeeId")}
-                isInvalid={!!errors.employeeId}
-                onChange={onEmployeeChange}
-                onClick={handleEmployeeDropdownClick} // Trigger fetch on click
-              >
-                <option value="">Select an employee</option>
-                {employees.map((employee) => (
-                  <option key={employee.id} value={employee.id}>
-                    {employee.fullName}
-                  </option>
-                ))}
-              </Form.Control>
-              <Form.Control.Feedback type="invalid">
-                {errors.employeeId?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formStatus" className="mb-3">
-              <Form.Label>Status</Form.Label>
-              <Form.Control
-                as="select"
-                {...register("statusId")}
-                isInvalid={!!errors.statusId}
-                onChange={onStatusChange}
-                onClick={handleStatusDropdownClick} // Trigger fetch on click
-              >
-                <option value="">Select a status</option>
-                {statuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.description}
-                  </option>
-                ))}
-              </Form.Control>
-              <Form.Control.Feedback type="invalid">
-                {errors.statusId?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <div
-              className="d-flex justify-content-start mt-2"
-              style={{ gap: "1rem" }}
-            >
-              <Button
-                variant="primary"
-                type="submit"
-                size="lg"
-                style={{ maxWidth: "10rem" }}
-              >
-                Submit
-              </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                style={{ maxWidth: "10rem" }}
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-            </div>
-          </Form>
-        </Card.Body>
-      </Card>
-      <ConfirmCancelModal
-        show={showModal}
-        onConfirm={() => confirmCancel(setShowModal, navigate)}
-        onCancel={() => closeModal(setShowModal, () => {})}
-      />
-    </Container>
+              </Form>
+            </Card.Body>
+          </Card>
+          <ConfirmCancelModal
+            show={showModal}
+            onConfirm={() => confirmCancel(setShowModal, navigate)}
+            onCancel={() => closeModal(setShowModal, () => {})}
+          />
+        </Container>
+      )}
+    </WithLoadingAndError>
   );
 };
 

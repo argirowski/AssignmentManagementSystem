@@ -3,7 +3,6 @@ import { Container, Card, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { AppState } from "../../store";
 import { fetchStatusByIdAction } from "../../redux/status/statusActions";
-import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 
@@ -26,8 +25,13 @@ const StatusDetails: React.FC = () => {
   }, [dispatch, id]);
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {status ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!status}
+      notFoundMessage="Status not found."
+    >
+      {status && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -61,8 +65,6 @@ const StatusDetails: React.FC = () => {
             </Button>
           </div>
         </Container>
-      ) : (
-        <NotFoundComponent message="Status not found." />
       )}
     </WithLoadingAndError>
   );

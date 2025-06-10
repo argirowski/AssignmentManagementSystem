@@ -27,8 +27,13 @@ const AssignmentDetails: React.FC = () => {
   }, [dispatch, id]);
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {assignment ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!assignment}
+      notFoundMessage="Assignment not found."
+    >
+      {assignment && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -86,8 +91,6 @@ const AssignmentDetails: React.FC = () => {
             </Button>
           </div>
         </Container>
-      ) : (
-        <NotFoundComponent message="Assignment not found." />
       )}
     </WithLoadingAndError>
   );

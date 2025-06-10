@@ -11,7 +11,6 @@ import {
   fetchStatusByIdAction,
   updateStatusAction,
 } from "../../redux/status/statusActions";
-import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 import {
@@ -72,8 +71,13 @@ const EditStatusForm: React.FC = () => {
   };
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {status ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!status}
+      notFoundMessage="Status not found."
+    >
+      {status && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -123,8 +127,6 @@ const EditStatusForm: React.FC = () => {
             onCancel={() => closeModal(setShowModal, () => {})}
           />
         </Container>
-      ) : (
-        <NotFoundComponent message="Status not found." />
       )}
     </WithLoadingAndError>
   );

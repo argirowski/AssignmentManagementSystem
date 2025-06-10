@@ -4,7 +4,6 @@ import { Container, Card, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { AppState } from "../../store";
 import { fetchEmployeeByIdAction } from "../../redux/employee/employeeActions";
-import NotFoundComponent from "../../components/NotFoundComponent";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 
 const EmployeeDetails: React.FC = () => {
@@ -26,8 +25,13 @@ const EmployeeDetails: React.FC = () => {
   }, [dispatch, id]);
 
   return (
-    <WithLoadingAndError loading={loading} error={error}>
-      {employee ? (
+    <WithLoadingAndError
+      loading={loading}
+      error={error}
+      notFound={!employee}
+      notFoundMessage="Employee not found."
+    >
+      {employee && (
         <Container
           style={{ maxWidth: "50rem", margin: "0 auto", textAlign: "center" }}
         >
@@ -64,8 +68,6 @@ const EmployeeDetails: React.FC = () => {
             </Button>
           </div>
         </Container>
-      ) : (
-        <NotFoundComponent message="Employee not found." />
       )}
     </WithLoadingAndError>
   );
