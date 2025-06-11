@@ -11,15 +11,15 @@ Infrastructure/bin/
 Infrastructure/obj/
 
 # Unit Tests
-BookManagementUnitTests/bin/
-BookManagementUnitTests/obj/
-BookManagementUnitTests/coveragereport/
-BookManagementUnitTests/TestResults/
+AssignmentManagementSystem/bin/
+AssignmentManagementSystem/obj/
+AssignmentManagementSystem/coveragereport/
+AssignmentManagementSystem/TestResults/
 
 # Frontend
-book-management-ui/node_modules/
-book-management-ui/build/
-book-management-ui/.env
+assignment-management-ui/node_modules/
+assignment-management-ui/build/
+assignment-management-ui/.env
 
 # BookManagement Folder
 .vs/
