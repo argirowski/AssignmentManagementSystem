@@ -13,6 +13,8 @@ Infrastructure/obj/
 # Unit Tests
 BookManagementUnitTests/bin/
 BookManagementUnitTests/obj/
+BookManagementUnitTests/coveragereport/
+BookManagementUnitTests/TestResults/
 
 # Frontend
 book-management-ui/node_modules/
