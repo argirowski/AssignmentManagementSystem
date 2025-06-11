@@ -12,6 +12,7 @@ namespace Persistence.UnitOfWork
         private IStatusRepository? _statusRepository;
         private IEmployeeRepository? _employeeRepository;
         private IAssignmentRepository? _assignmentRepository;
+        private IDbTransaction? _transaction;
 
         public UnitOfWork(IDbConnection dbConnection)
         {
@@ -20,27 +21,34 @@ namespace Persistence.UnitOfWork
             {
                 _dbConnection.Open();
             }
+            _transaction = _dbConnection.BeginTransaction();
         }
 
-        public ICategoryRepository Categories => _categoryRepository ??= new CategoryRepository(_dbConnection);
-        public IStatusRepository Statuses => _statusRepository ??= new StatusRepository(_dbConnection);
-        public IEmployeeRepository Employees => _employeeRepository ??= new EmployeeRepository(_dbConnection);
-        public IAssignmentRepository Assignments => _assignmentRepository ??= new AssignmentRepository(_dbConnection);
+        public ICategoryRepository Categories => _categoryRepository ??= new CategoryRepository(_dbConnection, _transaction);
+        public IStatusRepository Statuses => _statusRepository ??= new StatusRepository(_dbConnection, _transaction);
+        public IEmployeeRepository Employees => _employeeRepository ??= new EmployeeRepository(_dbConnection, _transaction);
+        public IAssignmentRepository Assignments => _assignmentRepository ??= new AssignmentRepository(_dbConnection, _transaction);
 
-        public Task<int> CompleteAsync()
+        public async Task<int> CompleteAsync()
         {
-            // Assuming the use of a transaction, commit it here.
-            if (_dbConnection.State == ConnectionState.Open)
+            if (_transaction != null)
             {
-                // Commit transaction logic if applicable
-                return Task.FromResult(1); // Return a dummy value for now
+                _transaction.Commit();
+                _transaction.Dispose();
+                _transaction = null;
+                return 1;
             }
-
-            return Task.FromResult(0);
+            return 0;
         }
 
         public void Dispose()
         {
+            if (_transaction != null)
+            {
+                _transaction.Rollback();
+                _transaction.Dispose();
+                _transaction = null;
+            }
             _dbConnection?.Dispose();
         }
     }

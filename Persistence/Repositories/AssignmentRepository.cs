@@ -5,10 +5,12 @@ using Domain.Entities;
 public class AssignmentRepository : IAssignmentRepository
 {
     private readonly IDbConnection _dbConnection;
+    private readonly IDbTransaction? _transaction;
 
-    public AssignmentRepository(IDbConnection dbConnection)
+    public AssignmentRepository(IDbConnection dbConnection, IDbTransaction? transaction = null)
     {
         _dbConnection = dbConnection;
+        _transaction = transaction;
     }
 
     public async Task<IEnumerable<Assignment>> GetAllAsync()
@@ -54,6 +56,8 @@ public class AssignmentRepository : IAssignmentRepository
 
                 return existingAssignment;
             },
+                null, // no parameters
+                _transaction, // pass the transaction
                 splitOn: "Id,Id,Id,Id"
         );
 
@@ -101,6 +105,7 @@ public class AssignmentRepository : IAssignmentRepository
                 return assignmentEntry;
             },
             new { Id = id },
+            _transaction, // pass the transaction
             splitOn: "Id,Id,Id");
 
         return assignmentDictionary.Values.FirstOrDefault();
@@ -111,39 +116,26 @@ public class AssignmentRepository : IAssignmentRepository
         const string assignmentQuery = "INSERT INTO Assignments (Id, Title, Description, EmployeeId, StatusId, IsCompleted, CreatedAt) VALUES (@Id, @Title, @Description, @EmployeeId, @StatusId, @IsCompleted, @CreatedAt)";
         const string categoryLinkQuery = "INSERT INTO AssignmentCategories (AssignmentId, CategoryId) VALUES (@AssignmentId, @CategoryId)";
 
-        using (var transaction = _dbConnection.BeginTransaction())
+        // Insert Assignment
+        await _dbConnection.ExecuteAsync(assignmentQuery, new
         {
-            try
-            {
-                // Insert Assignment
-                await _dbConnection.ExecuteAsync(assignmentQuery, new
-                {
-                    assignment.Id,
-                    assignment.Title,
-                    assignment.Description,
-                    EmployeeId = assignment.Employee.Id,
-                    StatusId = assignment.Status.Id,
-                    IsCompleted = assignment.IsCompleted,
-                    CreatedAt = assignment.CreatedAt
-                }, transaction);
+            assignment.Id,
+            assignment.Title,
+            assignment.Description,
+            EmployeeId = assignment.Employee.Id,
+            StatusId = assignment.Status.Id,
+            IsCompleted = assignment.IsCompleted,
+            CreatedAt = assignment.CreatedAt
+        }, _transaction);
 
-                // Link Categories
-                foreach (var category in assignment.AssignmentCategories)
-                {
-                    await _dbConnection.ExecuteAsync(categoryLinkQuery, new
-                    {
-                        AssignmentId = assignment.Id,
-                        CategoryId = category.CategoryId
-                    }, transaction);
-                }
-
-                transaction.Commit();
-            }
-            catch
+        // Link Categories
+        foreach (var category in assignment.AssignmentCategories)
+        {
+            await _dbConnection.ExecuteAsync(categoryLinkQuery, new
             {
-                transaction.Rollback();
-                throw;
-            }
+                AssignmentId = assignment.Id,
+                CategoryId = category.CategoryId
+            }, _transaction);
         }
     }
 
@@ -153,38 +145,25 @@ public class AssignmentRepository : IAssignmentRepository
         const string deleteAssignmentCategoriesQuery = "DELETE FROM AssignmentCategories WHERE AssignmentId = @Id";
         const string insertAssignmentCategoriesQuery = "INSERT INTO AssignmentCategories (AssignmentId, CategoryId) VALUES (@AssignmentId, @CategoryId)";
 
-        using (var transaction = _dbConnection.BeginTransaction())
+        await _dbConnection.ExecuteAsync(updateAssignmentQuery, new
         {
-            try
+            assignment.Id,
+            assignment.Title,
+            assignment.Description,
+            EmployeeId = assignment.Employee.Id,
+            StatusId = assignment.Status.Id,
+            assignment.IsCompleted
+        }, _transaction);
+
+        await _dbConnection.ExecuteAsync(deleteAssignmentCategoriesQuery, new { assignment.Id }, _transaction);
+
+        foreach (var category in assignment.AssignmentCategories)
+        {
+            await _dbConnection.ExecuteAsync(insertAssignmentCategoriesQuery, new
             {
-                await _dbConnection.ExecuteAsync(updateAssignmentQuery, new
-                {
-                    assignment.Id,
-                    assignment.Title,
-                    assignment.Description,
-                    EmployeeId = assignment.Employee.Id,
-                    StatusId = assignment.Status.Id,
-                    assignment.IsCompleted
-                }, transaction);
-
-                await _dbConnection.ExecuteAsync(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
-
-                foreach (var category in assignment.AssignmentCategories)
-                {
-                    await _dbConnection.ExecuteAsync(insertAssignmentCategoriesQuery, new
-                    {
-                        AssignmentId = assignment.Id,
-                        CategoryId = category.CategoryId
-                    }, transaction);
-                }
-
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+                AssignmentId = assignment.Id,
+                CategoryId = category.CategoryId
+            }, _transaction);
         }
     }
 
@@ -193,19 +172,7 @@ public class AssignmentRepository : IAssignmentRepository
         const string deleteAssignmentCategoriesQuery = "DELETE FROM AssignmentCategories WHERE AssignmentId = @Id";
         const string deleteAssignmentQuery = "DELETE FROM Assignments WHERE Id = @Id";
 
-        using (var transaction = _dbConnection.BeginTransaction())
-        {
-            try
-            {
-                await _dbConnection.ExecuteAsync(deleteAssignmentCategoriesQuery, new { assignment.Id }, transaction);
-                await _dbConnection.ExecuteAsync(deleteAssignmentQuery, new { assignment.Id }, transaction);
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
-        }
+        await _dbConnection.ExecuteAsync(deleteAssignmentCategoriesQuery, new { assignment.Id }, _transaction);
+        await _dbConnection.ExecuteAsync(deleteAssignmentQuery, new { assignment.Id }, _transaction);
     }
 }
