@@ -56,7 +56,7 @@ public class StatusServiceTests
     public async Task GetStatusByIdAsync_InvalidId_ThrowsKeyNotFoundException()
     {
         // Arrange
-        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Status)null);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Status?)null);
 
         // Act & Assert
         await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.GetStatusByIdAsync(Guid.NewGuid()));
@@ -69,7 +69,7 @@ public class StatusServiceTests
         var createDto = new CreateStatusDTO { Description = "In Progress" };
         var status = new Status { Id = Guid.NewGuid(), Description = createDto.Description };
 
-        _mockUnitOfWork.Setup(u => u.Statuses.GetByDescriptionAsync(createDto.Description)).ReturnsAsync((Status)null);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByDescriptionAsync(createDto.Description)).ReturnsAsync((Status?)null);
         _mockUnitOfWork.Setup(u => u.Statuses.AddAsync(It.IsAny<Status>())).Returns(Task.CompletedTask);
         _mockUnitOfWork.Setup(u => u.CompleteAsync()).Returns(Task.FromResult(0));
         _mockMapper.Setup(m => m.Map<Status>(createDto)).Returns(status);
@@ -93,5 +93,95 @@ public class StatusServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateStatusAsync(createDto));
+    }
+
+    [Fact]
+    public async Task UpdateStatusAsync_ValidData_UpdatesStatus()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var status = new Status { Id = id, Description = "Old" };
+        var statusDto = new StatusDTO { Id = id, Description = "New" };
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(id)).ReturnsAsync(status);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByDescriptionAsync(statusDto.Description)).ReturnsAsync((Status?)null);
+        _mockUnitOfWork.Setup(u => u.Statuses.UpdateAsync(status)).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+        _mockMapper.Setup(m => m.Map(statusDto, status)).Verifiable();
+
+        // Act
+        await _service.UpdateStatusAsync(id, statusDto);
+
+        // Assert
+        _mockUnitOfWork.Verify(u => u.Statuses.UpdateAsync(status), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateStatusAsync_StatusNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var statusDto = new StatusDTO { Id = id, Description = "New" };
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(id)).ReturnsAsync((Status?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateStatusAsync(id, statusDto));
+    }
+
+    [Fact]
+    public async Task UpdateStatusAsync_DuplicateDescription_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var status = new Status { Id = id, Description = "Old" };
+        var statusDto = new StatusDTO { Id = id, Description = "Duplicate" };
+        var existingStatus = new Status { Id = Guid.NewGuid(), Description = statusDto.Description };
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(id)).ReturnsAsync(status);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByDescriptionAsync(statusDto.Description)).ReturnsAsync(existingStatus);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateStatusAsync(id, statusDto));
+    }
+
+    [Fact]
+    public async Task DeleteStatusAsync_ValidId_DeletesStatus()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var status = new Status { Id = id, Description = "ToDelete" };
+        _mockUnitOfWork.Setup(u => u.Statuses.IsStatusLinkedToAssignmentsAsync(id)).ReturnsAsync(false);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(id)).ReturnsAsync(status);
+        _mockUnitOfWork.Setup(u => u.Statuses.DeleteAsync(id)).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+
+        // Act
+        await _service.DeleteStatusAsync(id);
+
+        // Assert
+        _mockUnitOfWork.Verify(u => u.Statuses.DeleteAsync(id), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteStatusAsync_StatusLinkedToAssignments_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _mockUnitOfWork.Setup(u => u.Statuses.IsStatusLinkedToAssignmentsAsync(id)).ReturnsAsync(true);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteStatusAsync(id));
+    }
+
+    [Fact]
+    public async Task DeleteStatusAsync_StatusNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _mockUnitOfWork.Setup(u => u.Statuses.IsStatusLinkedToAssignmentsAsync(id)).ReturnsAsync(false);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(id)).ReturnsAsync((Status?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteStatusAsync(id));
     }
 }

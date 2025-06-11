@@ -94,4 +94,96 @@ public class EmployeeServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.CreateEmployeeAsync(createDto));
     }
+
+    [Fact]
+    public async Task UpdateEmployeeAsync_ValidData_UpdatesAndReturnsEmployee()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var employee = new Employee { Id = id, FullName = "John Doe", Email = "johndoe@example.com" };
+        var employeeDto = new EmployeeDTO { Id = id, FullName = "John Doe", Email = "johndoe@example.com" };
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(id)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByFullNameAsync(employeeDto.FullName)).ReturnsAsync((Employee?)null);
+        _mockUnitOfWork.Setup(u => u.Employees.UpdateAsync(employee)).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+        _mockMapper.Setup(m => m.Map(employeeDto, employee)).Verifiable();
+        _mockMapper.Setup(m => m.Map<EmployeeDTO>(employee)).Returns(employeeDto);
+
+        // Act
+        var result = await _service.UpdateEmployeeAsync(id, employeeDto);
+
+        // Assert
+        Assert.Equal(employeeDto, result);
+        _mockUnitOfWork.Verify(u => u.Employees.UpdateAsync(employee), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAsync_EmployeeNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var employeeDto = new EmployeeDTO { Id = id, FullName = "John Doe", Email = "johndoe@example.com" };
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(id)).ReturnsAsync((Employee?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateEmployeeAsync(id, employeeDto));
+    }
+
+    [Fact]
+    public async Task UpdateEmployeeAsync_DuplicateName_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var employee = new Employee { Id = id, FullName = "John Doe", Email = "johndoe@example.com" };
+        var employeeDto = new EmployeeDTO { Id = id, FullName = "Jane Smith", Email = "janesmith@example.com" };
+        var existingEmployee = new Employee { Id = Guid.NewGuid(), FullName = employeeDto.FullName, Email = employeeDto.Email };
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(id)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByFullNameAsync(employeeDto.FullName)).ReturnsAsync(existingEmployee);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateEmployeeAsync(id, employeeDto));
+    }
+
+    [Fact]
+    public async Task DeleteEmployeeAsync_ValidId_DeletesEmployee()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var employee = new Employee { Id = id, FullName = "John Doe", Email = "johndoe@example.com" };
+        _mockUnitOfWork.Setup(u => u.Employees.IsEmployeeLinkedToAssignmentsAsync(id)).ReturnsAsync(false);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(id)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Employees.RemoveAsync(employee)).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+
+        // Act
+        await _service.DeleteEmployeeAsync(id);
+
+        // Assert
+        _mockUnitOfWork.Verify(u => u.Employees.RemoveAsync(employee), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteEmployeeAsync_EmployeeLinkedToAssignments_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _mockUnitOfWork.Setup(u => u.Employees.IsEmployeeLinkedToAssignmentsAsync(id)).ReturnsAsync(true);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteEmployeeAsync(id));
+    }
+
+    [Fact]
+    public async Task DeleteEmployeeAsync_EmployeeNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _mockUnitOfWork.Setup(u => u.Employees.IsEmployeeLinkedToAssignmentsAsync(id)).ReturnsAsync(false);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(id)).ReturnsAsync((Employee?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteEmployeeAsync(id));
+    }
 }

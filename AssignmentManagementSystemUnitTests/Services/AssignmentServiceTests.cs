@@ -192,4 +192,185 @@ public class AssignmentServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(createDto));
     }
+
+    [Fact]
+    public async Task CreateAsync_InvalidStatus_ThrowsArgumentException()
+    {
+        // Arrange
+        var createDto = new CreateAssignmentDTO
+        {
+            Title = "New Assignment",
+            Description = "Default Description",
+            EmployeeId = Guid.NewGuid(),
+            StatusId = Guid.NewGuid(),
+            CategoryIds = new()
+        };
+        var employee = new Employee { Id = createDto.EmployeeId, FullName = "John Doe", Email = "johndoe@example.com" };
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(createDto.EmployeeId)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(createDto.StatusId)).ReturnsAsync((Status?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(createDto));
+    }
+
+    [Fact]
+    public async Task CreateAsync_InvalidCategory_ThrowsArgumentException()
+    {
+        // Arrange
+        var badCategoryId = Guid.NewGuid();
+        var createDto = new CreateAssignmentDTO
+        {
+            Title = "New Assignment",
+            Description = "Default Description",
+            EmployeeId = Guid.NewGuid(),
+            StatusId = Guid.NewGuid(),
+            CategoryIds = new List<Guid> { badCategoryId }
+        };
+        var employee = new Employee { Id = createDto.EmployeeId, FullName = "John Doe", Email = "johndoe@example.com" };
+        var status = new Status { Id = createDto.StatusId, Description = "In Progress" };
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(createDto.EmployeeId)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(createDto.StatusId)).ReturnsAsync(status);
+        _mockUnitOfWork.Setup(u => u.Categories.GetByIdAsync(badCategoryId)).ReturnsAsync((Category?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateAsync(createDto));
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ValidId_DeletesAssignment()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var assignment = new Assignment { Id = id, Title = "Test Assignment", Description = "desc" };
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync(assignment);
+        _mockUnitOfWork.Setup(u => u.Assignments.RemoveAsync(assignment)).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+
+        // Act
+        await _service.DeleteAsync(id);
+
+        // Assert
+        _mockUnitOfWork.Verify(u => u.Assignments.RemoveAsync(assignment), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_AssignmentNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync((Assignment?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.DeleteAsync(id));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ValidData_UpdatesAssignment()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var employeeId = Guid.NewGuid();
+        var statusId = Guid.NewGuid();
+        var categoryId = Guid.NewGuid();
+        var assignment = new Assignment { Id = id, Title = "Old Title", Description = "desc" };
+        var employee = new Employee { Id = employeeId, FullName = "John Doe", Email = "john@example.com" };
+        var status = new Status { Id = statusId, Description = "In Progress" };
+        var category = new Category { Id = categoryId, Name = "Cat1" };
+        var updateDto = new CreateAssignmentDTO
+        {
+            Title = "New Title",
+            Description = "New Desc",
+            EmployeeId = employeeId,
+            StatusId = statusId,
+            CategoryIds = new List<Guid> { categoryId },
+            IsCompleted = true
+        };
+        var assignmentDto = new AssignmentDTO
+        {
+            Id = id,
+            Title = updateDto.Title,
+            Description = updateDto.Description,
+            Employee = new EmployeeDTO { Id = employeeId, FullName = employee.FullName, Email = employee.Email },
+            Status = new StatusDTO { Id = statusId, Description = status.Description },
+            Categories = new List<CategoryDTO> { new CategoryDTO { Id = categoryId, Name = category.Name } }
+        };
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync(assignment);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(employeeId)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(statusId)).ReturnsAsync(status);
+        _mockUnitOfWork.Setup(u => u.Categories.GetByIdAsync(categoryId)).ReturnsAsync(category);
+        _mockUnitOfWork.Setup(u => u.Assignments.UpdateAsync(assignment)).Returns(Task.CompletedTask);
+        _mockUnitOfWork.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+        _mockMapper.Setup(m => m.Map<AssignmentDTO>(assignment)).Returns(assignmentDto);
+
+        // Act
+        var result = await _service.UpdateAsync(id, updateDto);
+
+        // Assert
+        Assert.Equal(updateDto.Title, result.Title);
+        Assert.Equal(updateDto.Description, result.Description);
+        _mockUnitOfWork.Verify(u => u.Assignments.UpdateAsync(assignment), Times.Once);
+        _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_AssignmentNotFound_ThrowsKeyNotFoundException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var updateDto = new CreateAssignmentDTO { Title = "T", Description = "D", EmployeeId = Guid.NewGuid(), StatusId = Guid.NewGuid(), CategoryIds = new() };
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync((Assignment?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UpdateAsync(id, updateDto));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_InvalidEmployee_ThrowsArgumentException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var assignment = new Assignment { Id = id, Title = "T", Description = "D" };
+        var updateDto = new CreateAssignmentDTO { Title = "T", Description = "D", EmployeeId = Guid.NewGuid(), StatusId = Guid.NewGuid(), CategoryIds = new() };
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync(assignment);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(updateDto.EmployeeId)).ReturnsAsync((Employee?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.UpdateAsync(id, updateDto));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_InvalidStatus_ThrowsArgumentException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var assignment = new Assignment { Id = id, Title = "T", Description = "D" };
+        var employee = new Employee { Id = Guid.NewGuid(), FullName = "John Doe", Email = "john@example.com" };
+        var updateDto = new CreateAssignmentDTO { Title = "T", Description = "D", EmployeeId = employee.Id, StatusId = Guid.NewGuid(), CategoryIds = new() };
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync(assignment);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(employee.Id)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(updateDto.StatusId)).ReturnsAsync((Status?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.UpdateAsync(id, updateDto));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_InvalidCategory_ThrowsArgumentException()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var assignment = new Assignment { Id = id, Title = "T", Description = "D" };
+        var employee = new Employee { Id = Guid.NewGuid(), FullName = "John Doe", Email = "john@example.com" };
+        var status = new Status { Id = Guid.NewGuid(), Description = "In Progress" };
+        var badCategoryId = Guid.NewGuid();
+        var updateDto = new CreateAssignmentDTO { Title = "T", Description = "D", EmployeeId = employee.Id, StatusId = status.Id, CategoryIds = new List<Guid> { badCategoryId } };
+        _mockUnitOfWork.Setup(u => u.Assignments.GetByIdAsync(id)).ReturnsAsync(assignment);
+        _mockUnitOfWork.Setup(u => u.Employees.GetByIdAsync(employee.Id)).ReturnsAsync(employee);
+        _mockUnitOfWork.Setup(u => u.Statuses.GetByIdAsync(status.Id)).ReturnsAsync(status);
+        _mockUnitOfWork.Setup(u => u.Categories.GetByIdAsync(badCategoryId)).ReturnsAsync((Category?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.UpdateAsync(id, updateDto));
+    }
 }
