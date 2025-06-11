@@ -3,7 +3,7 @@ import { Container, Card, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { fetchAssignmentByIdAction } from "../../redux/assignment/assignmentActions";
 import { AppState } from "../../store";
-import NotFoundComponent from "../../components/NotFoundComponent";
+
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 

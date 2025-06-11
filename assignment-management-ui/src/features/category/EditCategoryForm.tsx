@@ -10,7 +10,6 @@ import { categorySchema, CategoryFormData } from "../../utils/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import ConfirmCancelModal from "../../components/ConfirmCancelModal";
-import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 import {

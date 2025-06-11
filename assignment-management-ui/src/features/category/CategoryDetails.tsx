@@ -3,7 +3,6 @@ import { Container, Card, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { AppState } from "../../store";
 import { fetchCategoryByIdAction } from "../../redux/category/categoryActions";
-import NotFoundComponent from "../../components/NotFoundComponent";
 import { useCommonHooks } from "../../hooks/useCommonHooks";
 import WithLoadingAndError from "../../components/WithLoadingAndError";
 
