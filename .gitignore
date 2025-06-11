@@ -11,10 +11,10 @@ Infrastructure/bin/
 Infrastructure/obj/
 
 # Unit Tests
-AssignmentManagementSystem/bin/
-AssignmentManagementSystem/obj/
-AssignmentManagementSystem/coveragereport/
-AssignmentManagementSystem/TestResults/
+AssignmentManagementSystemUnitTests/bin/
+AssignmentManagementSystemUnitTests/obj/
+AssignmentManagementSystemUnitTests/coveragereport/
+AssignmentManagementSystemUnitTests/TestResults/
 
 # Frontend
 assignment-management-ui/node_modules/
