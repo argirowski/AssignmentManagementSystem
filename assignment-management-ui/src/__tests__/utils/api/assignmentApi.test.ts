@@ -12,7 +12,14 @@ jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("assignmentApi", () => {
-  afterEach(() => jest.clearAllMocks());
+  let consoleSpy: jest.SpyInstance;
+  beforeEach(() => {
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+    consoleSpy.mockRestore();
+  });
 
   it("fetches assignments", async () => {
     const data = [{ id: "1", title: "Test" }] as Assignment[];
@@ -73,6 +80,55 @@ describe("assignmentApi", () => {
     expect(mockedAxios.put).toHaveBeenCalledWith(
       "http://localhost:5088/api/Assignment/1",
       assignment
+    );
+  });
+
+  it("logs and throws on fetch assignments error", async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiFetchAssignments()).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error fetching assignments:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on fetch assignment by id error", async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiFetchAssignmentById("1")).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error fetching assignment details:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on delete assignment error", async () => {
+    mockedAxios.delete.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiDeleteAssignment("1")).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error deleting assignment:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on add assignment error", async () => {
+    mockedAxios.post.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiAddAssignment({} as CreateAssignment)).rejects.toThrow(
+      "fail"
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error adding assignment:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on update assignment error", async () => {
+    mockedAxios.put.mockRejectedValueOnce(new Error("fail"));
+    await expect(
+      apiUpdateAssignment("1", {} as CreateAssignment)
+    ).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error updating assignment:",
+      expect.any(Error)
     );
   });
 });

@@ -12,7 +12,14 @@ jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("categoryApi", () => {
-  afterEach(() => jest.clearAllMocks());
+  let consoleSpy: jest.SpyInstance;
+  beforeEach(() => {
+    consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+    consoleSpy.mockRestore();
+  });
 
   it("fetches categories", async () => {
     const data = [{ id: "1", name: "Test" }] as Category[];
@@ -58,6 +65,53 @@ describe("categoryApi", () => {
     await apiDeleteCategory("1");
     expect(mockedAxios.delete).toHaveBeenCalledWith(
       "http://localhost:5088/api/Category/1"
+    );
+  });
+
+  it("logs and throws on fetch categories error", async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiFetchCategories()).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error fetching categories:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on fetch category by id error", async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiFetchCategoryById("1")).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error fetching category by ID:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on update category error", async () => {
+    mockedAxios.put.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiUpdateCategory("1", {} as Category)).rejects.toThrow(
+      "fail"
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error updating category:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on add category error", async () => {
+    mockedAxios.post.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiAddCategory("Test")).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error adding category:",
+      expect.any(Error)
+    );
+  });
+
+  it("logs and throws on delete category error", async () => {
+    mockedAxios.delete.mockRejectedValueOnce(new Error("fail"));
+    await expect(apiDeleteCategory("1")).rejects.toThrow("fail");
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Error deleting category:",
+      expect.any(Error)
     );
   });
 });
